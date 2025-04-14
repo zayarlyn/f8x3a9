@@ -40,7 +40,7 @@ export const TripMetadata = (props: { setStep: any }) => {
 					fullWidth
 					error={errors.name ? 'This Field is required' : ''}
 				/>
-				<Combobox
+				{/* <Combobox
 					options={[
 						{ label: 'Japan', value: 'japan' },
 						{ label: 'ChongQing', value: 'chongqing' },
@@ -51,7 +51,7 @@ export const TripMetadata = (props: { setStep: any }) => {
 					placeholder='Destination'
 					// error='Destination is required'
 					error={errors.destination ? 'This Field is required' : ''}
-				></Combobox>
+				></Combobox> */}
 				<DatePicker
 					startDate={trip.startDate ? new Date(trip.startDate) : undefined}
 					endDate={trip.endDate ? new Date(trip.endDate) : undefined}
@@ -61,7 +61,7 @@ export const TripMetadata = (props: { setStep: any }) => {
 				/>
 				<Button
 					onClick={() => {
-						const err = _.pickBy({ name: !trip.name, destination: !trip.location?.name, dates: !trip.startDate || !trip.endDate })
+						const err = _.pickBy({ name: !trip.name, dates: !trip.startDate || !trip.endDate })
 						if (!_.isEmpty(err)) return setErrors(err as typeof errors)
 						// const values = {
 						// 	name: faker.location.country(),

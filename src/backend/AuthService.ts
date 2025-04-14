@@ -1,10 +1,11 @@
-import { cookieExpireDuration } from '@me/app/api/auth/confirm/route'
 import jwt from 'jsonwebtoken'
 import { NextRequest } from 'next/server'
 import { myCookie } from './constants'
 import { UserModel } from './models/User'
 
 const SECRET = process.env.JWT_SECRET || 'super-secret'
+
+export const cookieExpireDuration = 60 * 60 * 24
 
 interface TokenPayload {
 	userId: string

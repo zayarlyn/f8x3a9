@@ -1,4 +1,4 @@
-import { AuthService } from '@me/backend/AuthService'
+import { AuthService, cookieExpireDuration } from '@me/backend/AuthService'
 import { myCookie } from '@me/backend/constants'
 import { UserModel } from '@me/backend/models/User'
 import { connectMongoose } from '@me/backend/mongoose'
@@ -7,8 +7,6 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { NextRequest, NextResponse } from 'next/server'
-
-export const cookieExpireDuration = 60 * 60 * 24
 
 export async function GET(request: NextRequest) {
 	const { searchParams } = new URL(request.url)
