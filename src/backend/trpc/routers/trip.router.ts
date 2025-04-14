@@ -44,10 +44,14 @@ export const tripRouter = t.router({
 
 			trip.set(values)
 			trip.userId = userId
-			const todoList = new TodoListModel({ name: 'To Visit', tripId: trip._id, userId })
-			const todoItem = new TodoItemModel({ name: 'Visit somewhere', todoListId: todoList.id, userId })
 
-			await Promise.all([trip.save(), todoList.save(), todoItem.save()])
+			if (!id) {
+				const todoList = new TodoListModel({ name: 'To Visit', tripId: trip._id, userId })
+				const todoItem = new TodoItemModel({ name: 'Visit somewhere', todoListId: todoList.id, userId })
+				await Promise.all([todoList.save(), todoItem.save()])
+			}
+
+			await trip.save()
 
 			// return new Promise((resolve) => setTimeout(() => resolve({ data: trip }), 1000))
 			return { data: trip }

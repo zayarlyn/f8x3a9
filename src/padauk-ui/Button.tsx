@@ -32,9 +32,7 @@ export const Button = (props: IProps) => {
 	const handleOnClick = async (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
 		e.stopPropagation()
 
-		console.log('click')
 		if (onClick) {
-			console.log('click')
 			const result = onClick()
 			if (result && result.then) {
 				setLoading(true)
@@ -75,7 +73,6 @@ export const IconButton = (props: IProps1) => {
 
 	const handleOnClick = async (e: MouseEvent<HTMLButtonElement, globalThis.MouseEvent>) => {
 		e.stopPropagation()
-		console.log('clicked')
 		if (onClick) onClick()
 	}
 

@@ -10,7 +10,7 @@ export function useQueryState<StateType>(trpcFetcher: any, { getPath }: { getPat
 	const router = useRouter()
 
 	useEffect(() => {
-		if ((error as any)?.data.code === 'UNAUTHORIZED') return router.push('/join')
+		if ((error as any)?.data?.code === 'UNAUTHORIZED') return router.push('/join')
 
 		const result = _.get(data, getPath)
 

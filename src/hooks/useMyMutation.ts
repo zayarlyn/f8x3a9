@@ -7,7 +7,7 @@ export function useMyMutation<T, O = any>(trpcFetcher: any) {
 
 	const handleMutation = async (args: T): Promise<O> => {
 		const result = await mutateAsync(args as any)
-		if ((error as any)?.data.code === 'UNAUTHORIZED') return router.push('/join')!
+		if ((error as any)?.data?.code === 'UNAUTHORIZED') return router.push('/join')!
 		return result as any
 	}
 

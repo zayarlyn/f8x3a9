@@ -4,14 +4,14 @@ import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { TodoItemSchema } from '@me/backend/models/TodoItem'
 import { useMyMutation } from '@me/hooks/useMyMutation'
 import { useQueryState } from '@me/hooks/useQueryState'
-import { Button } from '@me/padauk-ui'
 import Input from '@me/padauk-ui/Input'
 import { queryClient, trpc } from '@me/TrpcReactQueryCtx'
 import Linkify from 'linkify-react'
 import _ from 'lodash'
-import { Circle, CircleCheck } from 'lucide-react'
+import { Edit } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
+import { Button } from '../ui/button'
 
 interface ITodoDetail {
 	todoItem: TodoItemSchema
@@ -39,17 +39,33 @@ const TodoDetail = ({ todoItem, setTodoItem }: ITodoDetail) => {
 
 	return (
 		<div className='pb-4'>
-			<div className='w-11/12 mx-auto mt-20 mb-52'>
+			<div className='mt-20 mb-52 my-width'>
 				{isEditing ? (
 					<div className='flex flex-col gap-4'>
-						<Input onChange={(v) => setTodoItem({ name: v })} value={todoItem.name} placeholder='god' fullWidth />
+						<div className='flex items-center gap-2 justify-end'>
+							{/* <Buton className='text-black' onClick={() => handleSave({ deletedAt: true })} variant='link-btn'>
+								Delete
+							</Buton> */}
+							<Button onClick={() => handleSave(_.pick(todoItem, ['name', 'description']))} variant='link-btn'>
+								Save
+							</Button>
+
+							{/* {todoItem.done ? <CircleCheck /> : <Circle />} */}
+						</div>
+						<Input onChange={(v) => setTodoItem({ name: v })} value={todoItem.name} placeholder='Name' fullWidth />
 						<Input value={todoItem.description} onChange={(v) => setTodoItem({ description: v })} placeholder='Add note' fullWidth multiline />
 					</div>
 				) : (
 					<div>
 						<div className='mb-6 flex items-center justify-between' ref={parent}>
 							<h1 className='text-xl font-semibold'>{todoItem.name}</h1>
-							{todoItem.done ? <CircleCheck /> : <Circle />}
+							<div className='flex items-center gap-4'>
+								<Button onClick={() => setIsEditing(true)} variant='ghost' size='icon'>
+									<Edit />
+								</Button>
+
+								{/* {todoItem.done ? <CircleCheck /> : <Circle />} */}
+							</div>
 						</div>
 						{todoItem.description ? (
 							<p className='text-gray-500 whitespace-pre-wrap [&_a]:text-blue-500 [&_a]:hover:underline'>
@@ -61,30 +77,6 @@ const TodoDetail = ({ todoItem, setTodoItem }: ITodoDetail) => {
 							</Button>
 						)}
 					</div>
-				)}
-			</div>
-			<div className='p-4 bg-white flex flex-col gap-2 fixed w-full bottom-0 border-t border-t-gray-300'>
-				{isEditing ? (
-					<>
-						<Button onClick={() => handleSave(_.pick(todoItem, ['name', 'description']))} fullWidth>
-							Save
-						</Button>
-						<Button onClick={() => setIsEditing(false)} fullWidth>
-							Cancel
-						</Button>
-						<Button className='bg-red-400 hover:bg-red-500 active:bg-red-500' fullWidth>
-							Delete
-						</Button>
-					</>
-				) : (
-					<>
-						<Button onClick={() => setIsEditing(true)} fullWidth>
-							Edit
-						</Button>
-						<Button onClick={() => handleSave({ done: !todoItem.done })} fullWidth>
-							{todoItem.done ? 'Reopen Task' : 'Mark as Done'}
-						</Button>
-					</>
 				)}
 			</div>
 		</div>

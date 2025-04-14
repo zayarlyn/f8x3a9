@@ -19,7 +19,6 @@ export default function PlanTripPage() {
 	const onChange = (obj: any) => {
 		setTrip((prev) => ({ ...prev, ...obj }))
 	}
-	console.log(trip)
 
 	return (
 		<div className='flex flex-col items-center justify-center h-screen'>

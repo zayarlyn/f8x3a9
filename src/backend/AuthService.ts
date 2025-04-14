@@ -1,8 +1,8 @@
+import { cookieExpireDuration } from '@me/app/api/auth/confirm/route'
 import jwt from 'jsonwebtoken'
 import { NextRequest } from 'next/server'
-import { UserModel } from './models/User'
-import { TRPCError } from '@trpc/server'
 import { myCookie } from './constants'
+import { UserModel } from './models/User'
 
 const SECRET = process.env.JWT_SECRET || 'super-secret'
 
@@ -13,7 +13,7 @@ interface TokenPayload {
 
 export class AuthService {
 	static signJwtToken(payload: TokenPayload): string {
-		return jwt.sign(payload, SECRET, { expiresIn: '1h' })
+		return jwt.sign(payload, SECRET, { expiresIn: cookieExpireDuration })
 	}
 
 	static verifyJwtToken(token: string): TokenPayload | null {
@@ -31,7 +31,6 @@ export class AuthService {
 		const payload = AuthService.verifyJwtToken(myCk.value)
 		if (!payload) return
 		const user = await UserModel.findOne({ _id: payload.userId })
-		if (user) return user
-		return
+		return user
 	}
 }

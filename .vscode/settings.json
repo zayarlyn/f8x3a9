@@ -1,5 +1,5 @@
 {
-	"cSpell.words": ["supabase"],
+	"cSpell.words": ["supabase", "Traplan"],
 	"files.exclude": {
 		"**/.next": true,
 		"**/next-env.d.ts": true,

@@ -8,6 +8,8 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { NextRequest, NextResponse } from 'next/server'
 
+export const cookieExpireDuration = 60 * 60 * 24
+
 export async function GET(request: NextRequest) {
 	const { searchParams } = new URL(request.url)
 	const token_hash = searchParams.get('token_hash')
@@ -30,7 +32,8 @@ export async function GET(request: NextRequest) {
 			secure: process.env.NODE_ENV === 'production',
 			sameSite: 'strict',
 			path: '/',
-			maxAge: 60 * 60 * 24,
+			maxAge: cookieExpireDuration,
+			expires: cookieExpireDuration,
 		})
 		// const forwardedHost = request.headers.get('x-forwarded-host') // original origin before load balancer
 		// if (forwardedHost) return redirect(`http://${forwardedHost}${next}`)

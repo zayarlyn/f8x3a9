@@ -1,6 +1,6 @@
 import { prop, ReturnModelType } from '@typegoose/typegoose'
-import { Type } from 'class-transformer'
-import { IsDate, IsOptional, IsString, ValidateNested } from 'class-validator'
+import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator'
+import _ from 'lodash'
 import { Types } from 'mongoose'
 import { getOrRegisterModel } from '../mongoose'
 import { BaseSchema } from './BaseModel'
@@ -16,6 +16,12 @@ class LocationSchema {
 	@IsString()
 	@prop({ type: String })
 	locationId!: string
+}
+
+enum ETripStatus {
+	draft = 'draft',
+	started = 'started',
+	ended = 'ended',
 }
 
 // FIXME: SubDoc type hint doesn't work in create method
@@ -37,14 +43,14 @@ export class TripSchema extends BaseSchema {
 	@prop({ type: Date })
 	endDate: string
 
-	// @IsBoolean()
-	// @prop({ type: Boolean, default: true })
-	// draft: boolean
+	@IsEnum(ETripStatus)
+	@prop({ enum: ETripStatus, default: ETripStatus.draft })
+	status: ETripStatus
 
-	@ValidateNested()
-	@Type(() => LocationSchema)
-	@prop({ type: () => LocationSchema })
-	location!: LocationSchema
+	// @ValidateNested()
+	// @Type(() => LocationSchema)
+	// @prop({ type: () => LocationSchema })
+	// location!: LocationSchema
 
 	@IsString()
 	@prop({ type: Types.ObjectId })

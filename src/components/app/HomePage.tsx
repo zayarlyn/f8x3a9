@@ -7,64 +7,40 @@ import { addDays, format } from 'date-fns'
 import _ from 'lodash'
 import { useRouter } from 'next/navigation'
 import { Button } from '../ui/button'
+import { ETripStatus } from './TripDetailsPage'
 
-const TripList = ({ trips }: { trips: TripSchema[] }) => {
+const TripList = ({ trips, name }: { name: string; trips: TripSchema[] }) => {
 	const router = useRouter()
 	const [parent] = useAutoAnimate()
 
-	const handleSignOut = async () => {
-		router.push('/api/auth/disconnect')
-	}
-
 	return (
-		<div className=''>
-			<header className='py-2 px-4 flex items-center justify-between border-b border-b-gray-300 sticky top-0 bg-white'>
-				<span className='font-semibold'>Yolo Travel</span>
-				{/* <Button onClick={() => router.push('/join')} variant='link-btn' size='sm'>
-					Sign In
-				</Button> */}
-				<Button onClick={handleSignOut} variant='link-btn' size='sm'>
-					Sign Out
-				</Button>
-			</header>
-			<div className='p-4 pb-12'>
-				<div className='flex flex-col items-center justify-center h-28'>
-					<h1 className='text-xl'>You only live once</h1>
-
-					<Button onClick={() => router.push('/plan')} variant='link-btn' size='sm'>
-						Plan a trip
-					</Button>
-				</div>
-
-				<div className=''>
-					<div className='m-2'>
-						<span className='font-semibold'>History</span>
-					</div>
-
-					<div ref={parent} className='flex flex-col'>
-						{_.map(trips, (trip) => {
-							return (
-								// <Skeleton key={trip._id} loading={isLoading}>
-
-								<Button asChild key={trip._id} onClick={() => router.push('/trip/' + trip._id)} className='mb-3 p-2 block' size='free' variant='outline'>
-									<div className=''>
-										<div className='text-lg mb-1 font-semibold'>{trip.name}</div>
-										<div className='flex gap-2 justify-between'>
-											{/* <span>{trip.location.name}</span> */}
-											<span>
-												{trip.startDate && format(trip.startDate, 'yyyy-MM-dd')} - {trip.endDate && format(addDays(trip.endDate, 3), 'yyyy-MM-dd')}
-											</span>
-											<span className='font-semibold'>{_.sumBy(trip.todoLists, (t) => t.todoItems.length)} todos</span>
-										</div>
-									</div>
-								</Button>
-								// </Skeleton>
-							)
-						})}
-					</div>
-					{/* )} */}
-				</div>
+		<div className='mb-3'>
+			<div className='m-2'>
+				<span className='font-semibold'>{name}</span>
 			</div>
+
+			<div ref={parent} className='flex flex-col'>
+				{_.map(trips, (trip) => {
+					return (
+						// <Skeleton key={trip._id} loading={isLoading}>
+
+						<Button asChild key={trip._id} onClick={() => router.push('/trip/' + trip._id)} className='mb-3 p-2 block' size='free' variant='outline'>
+							<div className=''>
+								<div className='text-lg mb-1 font-semibold'>{trip.name}</div>
+								<div className='flex gap-2 justify-between'>
+									{/* <span>{trip.location.name}</span> */}
+									<span>
+										{trip.startDate && format(trip.startDate, 'yyyy-MM-dd')} - {trip.endDate && format(addDays(trip.endDate, 3), 'yyyy-MM-dd')}
+									</span>
+									<span className='font-semibold'>{_.sumBy(trip.todoLists, (t) => t.todoItems.length)} Todos</span>
+								</div>
+							</div>
+						</Button>
+						// </Skeleton>
+					)
+				})}
+			</div>
+			{/* )} */}
 		</div>
 	)
 }
@@ -99,6 +75,40 @@ const LoadingSkeleton = () => {
 	)
 }
 
+const Trips = ({ trips }: { trips: TripSchema[] }) => {
+	const router = useRouter()
+	const [parent] = useAutoAnimate()
+
+	const handleSignOut = async () => {
+		router.push('/api/auth/disconnect')
+	}
+
+	return (
+		<div className=''>
+			<header className='py-2 px-4 flex items-center justify-between border-b border-b-gray-300 sticky top-0 bg-white'>
+				<span className='font-semibold'>YOLO Travel</span>
+				{/* <Button onClick={() => router.push('/join')} variant='link-btn' size='sm'>
+					Sign In
+				</Button> */}
+				<Button onClick={handleSignOut} variant='link-btn' size='sm'>
+					Sign Out
+				</Button>
+			</header>
+			<div className='pt-4 pb-12 my-width'>
+				<div className='flex flex-col items-center justify-center h-28'>
+					<h1 className='text-xl'>You only live once</h1>
+
+					<Button onClick={() => router.push('/plan')} variant='link-btn' size='sm'>
+						Plan a trip
+					</Button>
+				</div>
+				<TripList name='Started' trips={_.filter(trips, { status: ETripStatus.started })} />
+				<TripList name='Upcoming' trips={_.filter(trips, { status: ETripStatus.draft })} />
+			</div>
+		</div>
+	)
+}
+
 export default function HomePage() {
 	const [trips, setTrips, { isLoading }] = useQueryState<TripSchema[]>(trpc.trip.query.queryOptions({}, {}), { getPath: 'data' })
 	const router = useRouter()
@@ -106,5 +116,5 @@ export default function HomePage() {
 
 	if (isLoading) return <LoadingSkeleton />
 
-	return <TripList trips={trips!} />
+	return <Trips trips={trips!} />
 }

@@ -15,6 +15,7 @@ import { twMerge } from 'tailwind-merge'
 import { TodoItemDialog } from './TodoItemDialog'
 import { TodoListDialog } from './TodoListDialog'
 import { Button } from './ui/button'
+import { ETripStatus } from './app/TripDetailsPage'
 
 const placeApiResponse = {
 	predictions: [
@@ -69,7 +70,7 @@ const placeApiResponse = {
 
 const options = _.map(placeApiResponse.predictions, (p) => ({ label: p.description, value: p.place_id }))
 
-const TodoItem = ({ onClick, todo, isEditing }: { onClick: any; todo: TodoItemSchema; isEditing: boolean }) => {
+const TodoItem = ({ onClick, todo, trip, isEditing }: { onClick: any; todo: TodoItemSchema; trip: TripSchema; isEditing: boolean }) => {
 	// const [todo, setTodo] = useState(dbTodo)
 	// const checked = Math.floor(Math.random() * 10) % 2 === 0
 	const { tripId } = useParams<any>()
@@ -86,6 +87,8 @@ const TodoItem = ({ onClick, todo, isEditing }: { onClick: any; todo: TodoItemSc
 		queryClient.setQueryData(queryKey, localTrip)
 		return saveTodoItem({ id: todo._id, values: { done: obj.done } })
 	}
+
+	const started = trip.status === ETripStatus.started
 
 	return (
 		<Button
@@ -105,9 +108,11 @@ const TodoItem = ({ onClick, todo, isEditing }: { onClick: any; todo: TodoItemSc
 						{todo.name}
 					</div>
 					<div>
-						<Button className='p-1' size='icon' variant='ghost' onClick={() => onChange({ done: !todo.done })}>
-							{todo.done ? <CircleCheck /> : <Circle />}
-						</Button>
+						{started && (
+							<Button className='p-1' size='icon' variant='ghost' onClick={() => onChange({ done: !todo.done })}>
+								{todo.done ? <CircleCheck /> : <Circle />}
+							</Button>
+						)}
 					</div>
 				</div>
 				{todo.description && (
@@ -140,7 +145,7 @@ export const TodoList = ({ todoList, trip }: { trip: TripSchema; todoList: TodoL
 			</div>
 			<div ref={parent} className='flex flex-col mb-1 gap-2'>
 				{_.map(todoList.todoItems, (todo) => {
-					return <TodoItem key={todo._id} todo={todo} isEditing={isEditing} onClick={() => setOpenTodo(todo)} />
+					return <TodoItem key={todo._id} todo={todo} trip={trip} isEditing={isEditing} onClick={() => setOpenTodo(todo)} />
 				})}
 			</div>
 			<Button
