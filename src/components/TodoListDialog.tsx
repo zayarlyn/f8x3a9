@@ -38,14 +38,16 @@ export const TodoListDialog = ({ trip, todoList, onClose }: { todoList?: TodoLis
 				</div>
 			</Dialog.Content>
 			<Dialog.Footer>
-				<Button onClick={() => handleSaveTodoItem({})} fullWidth>
-					{todoList?._id ? 'Save' : 'Create'}
-				</Button>
-				{todoList?._id ? (
-					<Button variant='destructive' onClick={() => handleSaveTodoItem({ deletedAt: true })} className='mt-2' fullWidth>
-						Delete
+				<div className='flex gap-2'>
+					{todoList?._id ? (
+						<Button variant='destructive' onClick={() => handleSaveTodoItem({ deletedAt: true })} className='grow'>
+							Delete
+						</Button>
+					) : null}
+					<Button onClick={() => handleSaveTodoItem({})} className='grow'>
+						{todoList?._id ? 'Save' : 'Create'}
 					</Button>
-				) : null}
+				</div>
 			</Dialog.Footer>
 		</Dialog>
 	)

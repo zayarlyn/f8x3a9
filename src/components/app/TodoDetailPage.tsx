@@ -57,9 +57,9 @@ const TodoDetail = ({ todoItem, setTodoItem }: ITodoDetail) => {
 					</div>
 				) : (
 					<div>
-						<div className='mb-6 flex items-center justify-between' ref={parent}>
+						<div className='mb-6 flex items-start justify-between gap-2' ref={parent}>
 							<h1 className='text-xl font-semibold'>{todoItem.name}</h1>
-							<div className='flex items-center gap-4'>
+							<div className='flex items-center gap-4 mt-1'>
 								<Button onClick={() => setIsEditing(true)} variant='ghost' size='icon'>
 									<Edit />
 								</Button>
@@ -72,7 +72,7 @@ const TodoDetail = ({ todoItem, setTodoItem }: ITodoDetail) => {
 								<Linkify>{todoItem.description}</Linkify>
 							</p>
 						) : (
-							<Button onClick={() => setIsEditing(true)} variant='link'>
+							<Button onClick={() => setIsEditing(true)} variant='link-btn'>
 								Add a note
 							</Button>
 						)}

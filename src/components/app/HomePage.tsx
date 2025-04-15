@@ -8,6 +8,15 @@ import _ from 'lodash'
 import { useRouter } from 'next/navigation'
 import { Button } from '../ui/button'
 import { ETripStatus } from './TripDetailsPage'
+import { twMerge } from 'tailwind-merge'
+
+export const List = ({ children, className, itemCount, ...props }: any) => {
+	return (
+		<div {...props} className={twMerge('', className)}>
+			{itemCount ? children : <span className='text-center text-gray-600'>List is empty</span>}
+		</div>
+	)
+}
 
 const TripList = ({ trips, name }: { name: string; trips: TripSchema[] }) => {
 	const router = useRouter()
@@ -19,7 +28,7 @@ const TripList = ({ trips, name }: { name: string; trips: TripSchema[] }) => {
 				<span className='font-semibold'>{name}</span>
 			</div>
 
-			<div ref={parent} className='flex flex-col'>
+			<List ref={parent} className='flex flex-col mb-4' itemCount={trips.length}>
 				{_.map(trips, (trip) => {
 					return (
 						// <Skeleton key={trip._id} loading={isLoading}>
@@ -39,7 +48,7 @@ const TripList = ({ trips, name }: { name: string; trips: TripSchema[] }) => {
 						// </Skeleton>
 					)
 				})}
-			</div>
+			</List>
 			{/* )} */}
 		</div>
 	)

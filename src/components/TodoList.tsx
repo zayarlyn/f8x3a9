@@ -16,6 +16,7 @@ import { TodoItemDialog } from './TodoItemDialog'
 import { TodoListDialog } from './TodoListDialog'
 import { Button } from './ui/button'
 import { ETripStatus } from './app/TripDetailsPage'
+import { List } from './app/HomePage'
 
 const placeApiResponse = {
 	predictions: [
@@ -103,9 +104,9 @@ const TodoItem = ({ onClick, todo, trip, isEditing }: { onClick: any; todo: Todo
 		>
 			<div className='pb-2'>
 				<div className='flex gap-2 items-start justify-between p-2 pb-0'>
-					<div className={twMerge('py-2 pl-2 select-none flex gap-2 items-start leading-4 font-semibold')}>
+					<div className={twMerge('truncate py-2 pl-2 select-none flex gap-2 items-start leading-4 font-semibold')}>
 						{/* <MapPinned className='shrink-0' /> */}
-						{todo.name}
+						<p className='truncate'>{todo.name}</p>
 					</div>
 					<div>
 						{started && (
@@ -143,11 +144,11 @@ export const TodoList = ({ todoList, trip }: { trip: TripSchema; todoList: TodoL
 					<SquarePen />
 				</Button>
 			</div>
-			<div ref={parent} className='flex flex-col mb-1 gap-2'>
+			<List ref={parent} className='flex flex-col mb-1 gap-2' itemCount={todoList.todoItems?.length}>
 				{_.map(todoList.todoItems, (todo) => {
 					return <TodoItem key={todo._id} todo={todo} trip={trip} isEditing={isEditing} onClick={() => setOpenTodo(todo)} />
 				})}
-			</div>
+			</List>
 			<Button
 				onClick={() => {
 					setOpenCreateTodo(true)

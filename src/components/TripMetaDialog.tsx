@@ -48,13 +48,6 @@ export const TripMetaDialog = ({ trip: dbTrip, onClose }: { todoList?: TodoListS
 						fullWidth
 						error={errors.name ? 'This Field is required' : ''}
 					/>
-					{/* <DatePicker
-						startDate={trip.startDate ? new Date(trip.startDate) : undefined}
-						endDate={trip.endDate ? new Date(trip.endDate) : undefined}
-						onChange={([startDate, endDate]: any) => onChange({ startDate, endDate })}
-						fullWidth
-						error={errors.dates ? 'This Field is required' : ''}
-					/> */}
 					<DateRangePicker
 						value={{ from: trip.startDate ? new Date(trip.startDate) : undefined, to: trip.endDate ? new Date(trip.endDate) : undefined }}
 						onChange={(v) => onChange({ startDate: v.from?.toISOString(), endDate: v.to?.toISOString() })}
@@ -62,14 +55,16 @@ export const TripMetaDialog = ({ trip: dbTrip, onClose }: { todoList?: TodoListS
 				</div>
 			</Dialog.Content>
 			<Dialog.Footer>
-				<Button onClick={() => handleSaveTodoItem({})} fullWidth>
-					{trip?._id ? 'Save' : 'Create'}
-				</Button>
-				{trip?._id ? (
-					<Button variant='destructive' onClick={() => handleSaveTodoItem({ deletedAt: true })} className='mt-2' fullWidth>
-						Delete
+				<div className='flex gap-2'>
+					{trip?._id ? (
+						<Button variant='destructive' onClick={() => handleSaveTodoItem({ deletedAt: true })} className='grow'>
+							Delete
+						</Button>
+					) : null}
+					<Button onClick={() => handleSaveTodoItem({})} className='grow'>
+						{trip?._id ? 'Save' : 'Create'}
 					</Button>
-				) : null}
+				</div>
 			</Dialog.Footer>
 		</Dialog>
 	)

@@ -51,8 +51,8 @@ export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any 
 	const [saveTrip] = useMyMutation<inferRouterInputs<AppRouter>['trip']['mutate']>(trpc.trip.mutate.mutationOptions())
 	const [parent] = useAutoAnimate()
 
-	const handleSaveTrip = () => {
-		saveTrip({ id: trip._id, values: { status: trip.status === ETripStatus.draft ? ETripStatus.started : ETripStatus.draft } }).then(() => {
+	const handleSaveTrip = async () => {
+		return saveTrip({ id: trip._id, values: { status: trip.status === ETripStatus.draft ? ETripStatus.started : ETripStatus.draft } }).then(() => {
 			queryClient.invalidateQueries({ queryKey: trpc.trip.query.queryKey({ id: trip._id }) })
 		})
 	}
