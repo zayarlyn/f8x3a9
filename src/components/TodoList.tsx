@@ -8,7 +8,7 @@ import { useMyMutation } from '@me/hooks/useMyMutation'
 import { queryClient, trpc } from '@me/TrpcReactQueryCtx'
 import { inferRouterInputs } from '@trpc/server'
 import _ from 'lodash'
-import { Circle, CircleCheck, SquarePen } from 'lucide-react'
+import { Circle, CircleCheck, GripVertical, SquarePen } from 'lucide-react'
 import { useParams, usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { twMerge } from 'tailwind-merge'
@@ -17,6 +17,10 @@ import { TodoListDialog } from './TodoListDialog'
 import { Button } from './ui/button'
 import { ETripStatus } from './app/TripDetailsPage'
 import { List } from './app/HomePage'
+import { DndContext, DragEndEvent } from '@dnd-kit/core'
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
+import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers'
 
 const placeApiResponse = {
 	predictions: [
@@ -71,13 +75,15 @@ const placeApiResponse = {
 
 const options = _.map(placeApiResponse.predictions, (p) => ({ label: p.description, value: p.place_id }))
 
-const TodoItem = ({ onClick, todo, trip, isEditing }: { onClick: any; todo: TodoItemSchema; trip: TripSchema; isEditing: boolean }) => {
+const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; onClick: any; todo: TodoItemSchema; trip: TripSchema; isEditing: boolean }) => {
 	// const [todo, setTodo] = useState(dbTodo)
 	// const checked = Math.floor(Math.random() * 10) % 2 === 0
 	const { tripId } = useParams<any>()
 	const pathname = usePathname()
 	const router = useRouter()
 	const [saveTodoItem] = useMyMutation<inferRouterInputs<AppRouter>['todoItem']['mutate']>(trpc.todoItem.mutate.mutationOptions())
+	const [parent] = useAutoAnimate()
+	const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: todo._id })
 
 	const onChange = (obj: Partial<TodoItemSchema>) => {
 		const queryKey = trpc.trip.query.queryKey({ id: tripId })
@@ -91,47 +97,91 @@ const TodoItem = ({ onClick, todo, trip, isEditing }: { onClick: any; todo: Todo
 
 	const started = trip.status === ETripStatus.started
 
+	const style = {
+		transform: CSS.Transform.toString(transform),
+		transition,
+	}
+
 	return (
-		<Button
-			onClick={() => router.push(pathname + '/todo/' + todo._id)}
-			className={twMerge('block', todo.done ? 'text-gray-500' : '', todo.done ? 'line-through' : '')}
-			asChild
-			variant='outline'
-			fullWidth
-			key={todo._id}
-			size='free'
-			// as='div'
-		>
-			<div className='pb-2'>
-				<div className='flex gap-2 items-start justify-between p-2 pb-0'>
-					<div className={twMerge('truncate py-2 pl-2 select-none flex gap-2 items-start leading-4 font-semibold')}>
-						{/* <MapPinned className='shrink-0' /> */}
-						<p className='truncate'>{todo.name}</p>
+		<div {...attributes} ref={setNodeRef} style={style}>
+			<Button
+				onClick={reordering ? undefined : () => router.push(pathname + '/todo/' + todo._id)}
+				className={twMerge('block', todo.done ? 'text-gray-500' : '', todo.done ? 'line-through' : '')}
+				asChild
+				variant='outline'
+				fullWidth
+				key={todo._id}
+				size='free'
+				// as='div'
+			>
+				<div ref={parent} className='pb-2'>
+					<div className='flex gap-2 items-start justify-between p-2 pb-0'>
+						<div className={twMerge('truncate py-2 pl-2 select-none flex gap-2 items-start leading-5 font-semibold')}>
+							{/* <MapPinned className='reordering-0' /> */}
+							<p className='truncate'>{todo.name}</p>
+						</div>
+						<div>
+							{reordering ? (
+								<div {...listeners}>
+									<Button className='p-1' variant='ghost' size='icon-md'>
+										<GripVertical />
+									</Button>
+								</div>
+							) : started ? (
+								<Button className='p-1' size='icon' variant='ghost' onClick={() => onChange({ done: !todo.done })}>
+									{todo.done ? <CircleCheck /> : <Circle />}
+								</Button>
+							) : null}
+						</div>
 					</div>
-					<div>
-						{started && (
-							<Button className='p-1' size='icon' variant='ghost' onClick={() => onChange({ done: !todo.done })}>
-								{todo.done ? <CircleCheck /> : <Circle />}
-							</Button>
-						)}
-					</div>
+					{!reordering && todo.description && (
+						<div className='px-4'>
+							<p className='truncate text-gray-500 leading-5'>{todo.description}</p>
+						</div>
+					)}
 				</div>
-				{todo.description && (
-					<div className='px-4'>
-						<p className='truncate text-gray-500 leading-5'>{todo.description}</p>
-					</div>
-				)}
-			</div>
-		</Button>
+			</Button>
+		</div>
 	)
 }
 
-export const TodoList = ({ todoList, trip }: { trip: TripSchema; todoList: TodoListSchema }) => {
+export const TodoList = ({ todoList, trip, setTrip }: { trip: TripSchema; setTrip: any; todoList: TodoListSchema }) => {
 	const [isEditing, setIsEditing] = useState(false)
 	const [openCreateTodo, setOpenCreateTodo] = useState(false)
 	const [openTodo, setOpenTodo] = useState<TodoItemSchema>()
 	const [openTodoList, setOpenTodoList] = useState<TodoListSchema>()
 	const [parent, enableAnimations] = useAutoAnimate(/* optional config */)
+	const [reordering, setReordering] = useState(false)
+	const [saveTodoList] = useMyMutation<inferRouterInputs<AppRouter>['todoList']['mutate']>(trpc.todoList.mutate.mutationOptions())
+
+	const handleDragEnd = (e: DragEndEvent) => {
+		const { active, over } = e
+		// const obj: Partial<TodoItemSchema>;
+		if (!over?.id) return
+		const queryKey = trpc.trip.query.queryKey({ id: trip._id })
+		const localTrip = _.cloneDeep(queryClient.getQueryData(queryKey))
+		const localTripData = localTrip?.data[0]
+		const todoListIndex = _.findIndex(localTripData?.todoLists, { _id: todoList._id })
+
+		const todoItems = localTripData?.todoLists[todoListIndex].todoItems
+		const sourceTodoIndex = _.findIndex(todoItems, { _id: active.id as string })
+		const targetTodoIndex = _.findIndex(todoItems, { _id: over.id as string })
+
+		// const sourceTodo = _.cloneDeep(todoItems?.[sourceTodoIndex])
+		// const targetTodo = _.cloneDeep(todoItems?.[targetTodoIndex])
+
+		if (!todoItems) return
+		const [sourceTodo] = todoItems.splice(sourceTodoIndex, 1)
+		if (!sourceTodo) return
+		todoItems.splice(targetTodoIndex, 0, sourceTodo)
+		todoItems[targetTodoIndex] = sourceTodo!
+		const sortOrder = _.map(todoItems, (t) => t._id)
+
+		localTripData.todoLists[todoListIndex].sortOrder = sortOrder
+
+		setTrip(localTrip)
+		queryClient.setQueryData(queryKey, localTrip)
+	}
 
 	return (
 		<div key={todoList._id} className='mb-8'>
@@ -140,15 +190,31 @@ export const TodoList = ({ todoList, trip }: { trip: TripSchema; todoList: TodoL
 			{openTodoList && <TodoListDialog trip={trip} todoList={todoList} onClose={() => setOpenTodoList(undefined)} />}
 			<div className={twMerge('flex justify-between items-center', todoList.todoItems.length ? 'mb-2' : '')}>
 				<h2 className='font-medium '>{todoList.name}</h2>
-				<Button variant='ghost' size='icon' onClick={() => setOpenTodoList(todoList)} className='text-black p-2'>
-					<SquarePen />
-				</Button>
+				<div className='flex items-center'>
+					<Button
+						onClick={() => {
+							setReordering((p) => !p)
+							if (reordering) return saveTodoList({ id: todoList._id, values: { sortOrder: todoList.sortOrder } })
+						}}
+						variant='link-btn'
+						className='-mt-1'
+					>
+						{reordering ? 'Save' : 'Reorder'}
+					</Button>
+					<Button variant='ghost' size='icon' onClick={() => setOpenTodoList(todoList)} className='text-black p-2'>
+						<SquarePen />
+					</Button>
+				</div>
 			</div>
-			<List ref={parent} className='flex flex-col mb-1 gap-2' itemCount={todoList.todoItems?.length}>
-				{_.map(todoList.todoItems, (todo) => {
-					return <TodoItem key={todo._id} todo={todo} trip={trip} isEditing={isEditing} onClick={() => setOpenTodo(todo)} />
-				})}
-			</List>
+			<DndContext onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis, restrictToParentElement]}>
+				<SortableContext items={_.map(todoList.todoItems, (t) => ({ ...t, id: t._id }))} strategy={verticalListSortingStrategy}>
+					<List ref={parent} className='flex flex-col mb-1 gap-2' itemCount={todoList.todoItems?.length}>
+						{_.map(todoList.todoItems, (todo) => {
+							return <TodoItem reordering={reordering} key={todo._id} todo={todo} trip={trip} isEditing={isEditing} onClick={() => setOpenTodo(todo)} />
+						})}
+					</List>
+				</SortableContext>
+			</DndContext>
 			<Button
 				onClick={() => {
 					setOpenCreateTodo(true)

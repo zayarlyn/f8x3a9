@@ -4,7 +4,7 @@ import { Types } from 'mongoose'
 
 export class BaseSchema {
 	@prop({ type: Types.ObjectId, auto: true })
-	_id?: string
+	_id: string
 
 	@prop({ type: Date })
 	createdAt!: string

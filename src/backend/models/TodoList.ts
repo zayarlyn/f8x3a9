@@ -11,6 +11,10 @@ export class TodoListSchema extends BaseSchema {
 	@prop({ type: String })
 	name!: string
 
+	@IsString({ each: true })
+	@prop({ type: () => [String], default: [] })
+	sortOrder: string[]
+
 	@prop({ type: Types.ObjectId })
 	tripId: string
 

@@ -3,6 +3,7 @@ import _ from 'lodash'
 import { z } from 'zod'
 import { t } from '../setup'
 import { TodoItemModel, TodoItemSchema } from '../../models/TodoItem'
+import { TodoListModel } from '@me/backend/models/TodoList'
 
 export const todoItemRouter = t.router({
 	query: t.procedure
@@ -30,6 +31,18 @@ export const todoItemRouter = t.router({
 			if (values) todoItem.set(values)
 			todoItem.userId = ctx.userId
 			todoItem.deletedAt = deletedAt ? new Date().toISOString() : undefined
+
+			const todoList = await TodoListModel.findOne({ _id: todoItem.todoListId, userId: ctx.userId })
+			if (!todoList) throw 'not found'
+
+			if (todoItem.deletedAt) {
+				todoList.sortOrder = _.without(todoList.sortOrder, todoItem._id)
+			}
+			if (!id) {
+				todoList.sortOrder = [...todoList.sortOrder, todoItem._id]
+			}
+
+			todoList.save()
 			todoItem.save()
 
 			// return new Promise((resolve) => setTimeout(() => resolve({ data: todoItem }), 0))

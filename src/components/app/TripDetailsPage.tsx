@@ -11,7 +11,7 @@ import { format } from 'date-fns'
 import _ from 'lodash'
 import { SquarePen } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { TodoList } from '../TodoList'
 import { TodoListDialog } from '../TodoListDialog'
 import { TripMetaDialog } from '../TripMetaDialog'
@@ -37,9 +37,9 @@ const TodoLists = ({ trip, setTrip }: { trip: TripSchema; setTrip: any }) => {
 					Create a list
 				</Button>
 			</div>
-			<div ref={parent} className='text-gray-500'>
+			<div className='text-gray-500'>
 				{_.map(trip.todoLists, (todoList) => {
-					return <TodoList trip={trip} todoList={todoList} key={todoList._id} />
+					return <TodoList trip={trip} setTrip={setTrip} todoList={todoList} key={todoList._id} />
 				})}
 			</div>
 		</div>
@@ -51,8 +51,8 @@ export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any 
 	const [saveTrip] = useMyMutation<inferRouterInputs<AppRouter>['trip']['mutate']>(trpc.trip.mutate.mutationOptions())
 	const [parent] = useAutoAnimate()
 
-	const handleSaveTrip = async () => {
-		return saveTrip({ id: trip._id, values: { status: trip.status === ETripStatus.draft ? ETripStatus.started : ETripStatus.draft } }).then(() => {
+	const handleSaveTrip = async (obj: Partial<TripSchema>) => {
+		return saveTrip({ id: trip._id, values: obj }).then(() => {
 			queryClient.invalidateQueries({ queryKey: trpc.trip.query.queryKey({ id: trip._id }) })
 		})
 	}
@@ -94,9 +94,16 @@ export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any 
 				</div>
 				<div className='mb-4'>
 					{/* {trip.status === ETripStatus.draft && ( */}
-					<Button onClick={() => handleSaveTrip()} fullWidth>
-						{canEnd ? 'End the trip' : started ? 'Cancel the trip' : 'Start the trip'}
+					<Button onClick={() => handleSaveTrip({ status: trip.status === ETripStatus.draft ? ETripStatus.started : ETripStatus.ended })} fullWidth>
+						{started ? 'End the trip' : 'Start the trip'}
 					</Button>
+					{started && (
+						<>
+							<Button onClick={() => handleSaveTrip({ status: ETripStatus.draft })} className='' variant='link-btn' fullWidth>
+								Cancel the trip
+							</Button>
+						</>
+					)}
 					{/* )} */}
 				</div>
 				<div className='flex flex-col gap-2 mb-20'>
@@ -152,7 +159,18 @@ const LoadingSkeleton = () => {
 
 export default function TripDetailsPage() {
 	const { tripId } = useParams()
-	const [trip, setTrip, { isLoading }] = useQueryState<TripSchema>(trpc.trip.query.queryOptions({ id: tripId as string }), { getPath: 'data.0' })
+	const [rawTrip, setTrip, { isLoading }] = useQueryState<TripSchema>(trpc.trip.query.queryOptions({ id: tripId as string }), { getPath: 'data.0' })
+
+	// O(n^2)
+	const trip = useMemo(() => {
+		if (!rawTrip) return undefined
+		const sortedTodoLists = _.map(rawTrip?.todoLists, (list) => ({
+			...list,
+			todoItems: list.sortOrder.length ? _.map(list.sortOrder, (_id) => _.find(list.todoItems, { _id })!) : list.todoItems,
+		}))
+		const result = { ...rawTrip, todoLists: sortedTodoLists }
+		return result
+	}, [rawTrip])
 
 	if (isLoading) return <LoadingSkeleton />
 
