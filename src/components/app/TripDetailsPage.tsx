@@ -222,7 +222,7 @@ export default function TripDetailsPage() {
 		if (!rawTrip) return undefined
 		const sortedTodoLists = _.map(rawTrip?.todoLists, (list) => ({
 			...list,
-			todoItems: list.sortOrder.length ? _.map(list.sortOrder, (_id) => _.find(list.todoItems, { _id })!) : list.todoItems,
+			todoItems: _.filter(_.map(list.sortOrder, (_id) => _.find(list.todoItems, { _id })!)),
 		}))
 		const result = { ...rawTrip, todoLists: sortedTodoLists }
 		return result
