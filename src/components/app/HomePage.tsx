@@ -6,9 +6,11 @@ import { trpc } from '@me/TrpcReactQueryCtx'
 import { addDays, format } from 'date-fns'
 import _ from 'lodash'
 import { useRouter } from 'next/navigation'
+import { twMerge } from 'tailwind-merge'
+import Logo from '../Logo'
 import { Button } from '../ui/button'
 import { ETripStatus } from './TripDetailsPage'
-import { twMerge } from 'tailwind-merge'
+import { Skeleton } from '../ui/skeleton'
 
 export const List = ({ children, className, itemCount, ...props }: any) => {
 	return (
@@ -56,30 +58,56 @@ const TripList = ({ trips, name }: { name: string; trips: TripSchema[] }) => {
 
 const LoadingSkeleton = () => {
 	return (
-		<div className='p-4'>
-			<div className='flex flex-col items-center justify-center h-28 mb-2'>
-				<h1 className='text-xl'>You only live once</h1>
+		<div className='min-h-screen flex flex-col'>
+			{/* Header */}
+			<header className='border-b p-4 py-3 flex items-center justify-between'>
+				<div className='flex items-center'>
+					<Skeleton className='h-6 w-6 mr-2' />
+					<Skeleton className='h-6 w-24' />
+				</div>
+				<Skeleton className='h-6 w-20' />
+			</header>
 
-				<Button className='pointer-events-none text-gray-600' variant='link-btn' size='sm'>
-					Plan a trip
-				</Button>
-			</div>
+			{/* Main content */}
+			<main className='flex-1 max-w-4xl mx-auto w-full px-4 py-8'>
+				{/* Hero section */}
+				<div className='text-center mb-8'>
+					<Skeleton className='h-8 w-48 mx-auto mb-2' />
+					<Skeleton className='h-6 w-24 mx-auto' />
+				</div>
 
-			<div className='h-5 w-20 bg-slate-300 animate-pulse mb-2' />
-			<div className='flex flex-col'>
-				{Array(7)
-					.fill(0)
-					.map((he, index) => {
-						return (
-							<div key={index}>
-								<div className='w-auto mb-3 p-2 rounded-md border border-gray-300'>
-									<div className='text-lg mb-1 bg-gray-300 whitespace-pre'> </div>
-									<div className='bg-gray-300 whitespace-pre'> </div>
-								</div>
+				{/* Started section */}
+				<div className='mb-10'>
+					<Skeleton className='h-6 w-24 mb-4' />
+
+					{/* Trip cards */}
+					{[1, 2, 3, 4].map((i) => (
+						<div key={`started-${i}`} className='border rounded-lg p-4 mb-4'>
+							<Skeleton className='h-6 w-48 mb-2' />
+							<Skeleton className='h-4 w-40 mb-4' />
+							<div className='flex justify-end'>
+								<Skeleton className='h-4 w-20' />
 							</div>
-						)
-					})}
-			</div>
+						</div>
+					))}
+				</div>
+
+				{/* Upcoming section */}
+				<div>
+					<Skeleton className='h-6 w-28 mb-4' />
+
+					{/* Trip cards */}
+					{[1, 2].map((i) => (
+						<div key={`upcoming-${i}`} className='border rounded-lg p-4 mb-4'>
+							<Skeleton className='h-6 w-48 mb-2' />
+							<Skeleton className='h-4 w-40 mb-4' />
+							<div className='flex justify-end'>
+								<Skeleton className='h-4 w-20' />
+							</div>
+						</div>
+					))}
+				</div>
+			</main>
 		</div>
 	)
 }
@@ -95,10 +123,7 @@ const Trips = ({ trips }: { trips: TripSchema[] }) => {
 	return (
 		<div className=''>
 			<header className='py-2 px-4 flex items-center justify-between border-b border-b-gray-300 sticky top-0 bg-white'>
-				<span className='font-semibold'>YOLO Travel</span>
-				{/* <Button onClick={() => router.push('/join')} variant='link-btn' size='sm'>
-					Sign In
-				</Button> */}
+				<Logo />
 				<Button onClick={handleSignOut} variant='link-btn' size='sm'>
 					Sign Out
 				</Button>

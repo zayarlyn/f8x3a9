@@ -6,6 +6,7 @@ import { Button } from '../ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card'
 import { Input } from '../ui/input'
 import { Separator } from '../ui/separator'
+import Logo from '../Logo'
 
 export default function SignIn() {
 	const [email, setEmail] = useState('')
@@ -44,7 +45,9 @@ export default function SignIn() {
 					{!isMagicLinkSent ? (
 						<>
 							<CardHeader className='space-y-1'>
-								<CardTitle className='text-2xl font-bold text-center'>Yolo Travel</CardTitle>
+								<CardTitle className='text-2xl font-bold text-center flex justify-center'>
+									<Logo className='scale-150' />
+								</CardTitle>
 								<CardDescription className='text-center'>Sign in to your account to continue</CardDescription>
 							</CardHeader>
 							<Button variant='outline' className='w-full justify-between font-normal' onClick={handleGoogleSignIn} disabled={isLoading || isGoogleLoading}>

@@ -18,6 +18,7 @@ import { TripMetaDialog } from '../TripMetaDialog'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Progress } from '../ui/progress'
+import { Skeleton } from '../ui/skeleton'
 
 export enum ETripStatus {
 	draft = 'draft',
@@ -116,42 +117,97 @@ export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any 
 
 const LoadingSkeleton = () => {
 	return (
-		<div className=''>
-			<div className='h-40 relative bg-slate-300 animate-pulse' />
-			<div className='relative text-center bg-white -translate-y-1/2 w-11/12 mx-auto p-3  rounded-md border-gray-300 border'>
-				<h1 className='text-lg font-medium  bg-slate-300 whitespace-pre'> </h1>
-				<p className='mt-1 whitespace-pre bg-slate-300 animate-pulse'> </p>
+		<div className='min-h-screen flex flex-col'>
+			{/* Background image and header */}
+			<div className='relative h-32 bg-slate-200'>
+				<Skeleton className='absolute top-0 left-0 right-0 bottom-0' />
+				<div className='absolute top-4 left-4 z-10'>
+					<Skeleton className='h-10 w-10 rounded-full' />
+				</div>
 			</div>
-			<div className='w-11/12 mx-auto flex flex-col gap-2 mb-20'>
-				<div className='flex justify-end mb-4'>
-					<div className='whitespace-pre bg-slate-300 animate-pulse w-30 h-6 my-2' />
+
+			{/* Trip details card */}
+			<div className='px-4 -mt-6 z-10'>
+				<div className='bg-white rounded-lg p-4 border border-gray-300'>
+					<div className='flex justify-between items-start mb-4'>
+						<Skeleton className='h-7 w-32' />
+						<Skeleton className='h-6 w-6' />
+					</div>
+					<Skeleton className='h-4 w-64 mb-4' />
+
+					{/* Progress section */}
+					<div className='mb-4'>
+						<div className='flex justify-between mb-1'>
+							<Skeleton className='h-4 w-20' />
+							<Skeleton className='h-4 w-12' />
+						</div>
+						<Skeleton className='h-2 w-full rounded-full' />
+					</div>
+
+					{/* Action buttons */}
+					<Skeleton className='h-12 w-full rounded-md mb-2' />
+					<div className='flex justify-center'>
+						<Skeleton className='h-4 w-28' />
+					</div>
 				</div>
-				<div>
-					{Array(2)
-						.fill(0)
-						.map((f, idx) => (
-							<div key={idx} className='mb-8'>
-								<div className='flex justify-between items-center mb-4'>
-									<h2 className='font-medium whitespace-pre bg-slate-300 animate-pulse w-30'> </h2>
-									<div className='bg-slate-300 animate-pulse w-6 h-6' />
-								</div>
-								<div className='flex flex-col gap-2 mb-2'>
-									{Array(3)
-										.fill(0)
-										.map((f, idx) => (
-											<div key={idx} className='p-3 border border-gray-300 rounded-md'>
-												<div className='flex w-full justify-between gap-4'>
-													<div className='h-6 bg-slate-300 whitespace-pre animate-pulse w-full'> </div>
-													<div className='h-6 bg-slate-300 whitespace-pre animate-pulse w-6' />
-												</div>
-												<div className='mt-2 h-5 bg-slate-300 whitespace-pre animate-pulse w-full' />
-											</div>
-										))}
-								</div>
-								{/* <div className='bg-slate-300 animate-pulse w-30 h-6' /> */}
-							</div>
-						))}
+			</div>
+
+			{/* Create a list button */}
+			<div className='flex justify-end px-4 mt-4'>
+				<Skeleton className='h-4 w-24' />
+			</div>
+
+			{/* To Explore tomorrow section */}
+			<div className='px-4 mt-6'>
+				<div className='flex justify-between items-center mb-4'>
+					<Skeleton className='h-5 w-40' />
+					<div className='flex items-center'>
+						<Skeleton className='h-4 w-16 mr-2' />
+						<Skeleton className='h-6 w-6' />
+					</div>
 				</div>
+
+				{/* List items */}
+				{[1, 2, 3].map((i) => (
+					<div key={`explore-${i}`} className='border-b py-4 flex justify-between items-center'>
+						<Skeleton className='h-5 w-48' />
+						<Skeleton className='h-6 w-6 rounded-full' />
+					</div>
+				))}
+
+				{/* Add a place */}
+				<div className='mt-4'>
+					<Skeleton className='h-4 w-24' />
+				</div>
+			</div>
+
+			{/* Internships section */}
+			<div className='px-4 mt-8'>
+				<div className='flex justify-between items-center mb-4'>
+					<Skeleton className='h-5 w-24' />
+					<div className='flex items-center'>
+						<Skeleton className='h-4 w-16 mr-2' />
+						<Skeleton className='h-6 w-6' />
+					</div>
+				</div>
+
+				{/* List items */}
+				{[1, 2, 3, 4].map((i) => (
+					<div key={`internship-${i}`} className='border-b py-4 flex justify-between items-center'>
+						<Skeleton className='h-5 w-36' />
+						<Skeleton className='h-6 w-6 rounded-full' />
+					</div>
+				))}
+
+				{/* Add a place */}
+				<div className='mt-4'>
+					<Skeleton className='h-4 w-24' />
+				</div>
+			</div>
+
+			{/* Profile button */}
+			<div className='fixed bottom-4 left-4'>
+				<Skeleton className='h-10 w-10 rounded-full' />
 			</div>
 		</div>
 	)

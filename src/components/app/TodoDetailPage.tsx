@@ -12,6 +12,7 @@ import { Edit } from 'lucide-react'
 import { useParams } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '../ui/button'
+import { Skeleton } from '../ui/skeleton'
 
 interface ITodoDetail {
 	todoItem: TodoItemSchema
@@ -85,34 +86,91 @@ const TodoDetail = ({ todoItem, setTodoItem }: ITodoDetail) => {
 
 const LoadingSkeleton = () => {
 	return (
-		<div className='max-w-2xl mx-auto px-4 py-8 w-full pt-20'>
-			{/* Title skeleton */}
-			<div className='mb-8 flex justify-between items-center'>
-				<div className='h-10 bg-gray-200 rounded-md w-3/4 animate-pulse'></div>
-				<div className='w-10 h-10 rounded-full bg-gray-200 animate-pulse'></div>
+		<div className='min-h-screen bg-white'>
+			{/* Header with back button */}
+			<div className='p-4'>
+				<Skeleton className='h-10 w-10 rounded-full' />
 			</div>
 
-			{/* First paragraph skeleton - multiple lines */}
-			<div className='space-y-2 mb-10'>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-11/12 animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-10/12 animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-9/12 animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
+			{/* Title section */}
+			<div className='px-6 py-4 flex justify-between items-start'>
+				<Skeleton className='h-6 w-3/4' />
+				<Skeleton className='h-6 w-6' />
 			</div>
 
-			{/* Second paragraph skeleton - multiple lines */}
-			<div className='space-y-2'>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-11/12 animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-10/12 animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-full animate-pulse'></div>
-				<div className='h-4 bg-gray-200 rounded-md w-9/12 animate-pulse'></div>
+			{/* Content items */}
+			<div className='px-6 space-y-8'>
+				{/* Item 1 */}
+				<div className='space-y-2'>
+					<div className='flex items-center space-x-2'>
+						<Skeleton className='h-5 w-32' />
+						<Skeleton className='h-4 w-16' />
+					</div>
+					<Skeleton className='h-4 w-full' />
+					<Skeleton className='h-4 w-5/6' />
+					<div className='flex items-center space-x-3 mt-2'>
+						<Skeleton className='h-4 w-24' />
+						<Skeleton className='h-4 w-12' />
+						<Skeleton className='h-4 w-12' />
+					</div>
+				</div>
+
+				{/* Item 2 */}
+				<div className='space-y-2'>
+					<div className='flex items-center space-x-2'>
+						<Skeleton className='h-5 w-28' />
+						<Skeleton className='h-4 w-16' />
+					</div>
+					<Skeleton className='h-4 w-full' />
+					<div className='flex items-center space-x-3 mt-2'>
+						<Skeleton className='h-4 w-16' />
+						<Skeleton className='h-4 w-8' />
+						<Skeleton className='h-4 w-10' />
+					</div>
+				</div>
+
+				{/* Item 3 */}
+				<div className='space-y-2'>
+					<div className='flex items-center space-x-2'>
+						<Skeleton className='h-5 w-24' />
+						<Skeleton className='h-4 w-16' />
+					</div>
+					<Skeleton className='h-4 w-full' />
+					<div className='flex items-center space-x-3 mt-2'>
+						<Skeleton className='h-4 w-14' />
+						<Skeleton className='h-4 w-8' />
+						<Skeleton className='h-4 w-10' />
+					</div>
+				</div>
+
+				{/* Item 4 */}
+				<div className='space-y-2'>
+					<div className='flex items-center space-x-2'>
+						<Skeleton className='h-5 w-36' />
+						<Skeleton className='h-4 w-16' />
+					</div>
+					<Skeleton className='h-4 w-full' />
+					<div className='flex items-center space-x-3 mt-2'>
+						<Skeleton className='h-4 w-16' />
+						<Skeleton className='h-4 w-10' />
+						<Skeleton className='h-4 w-8' />
+					</div>
+				</div>
+
+				{/* Item 5 */}
+				<div className='space-y-2'>
+					<div className='flex items-center space-x-2'>
+						<Skeleton className='h-5 w-32' />
+						<Skeleton className='h-4 w-16' />
+					</div>
+					<Skeleton className='h-4 w-full' />
+					<Skeleton className='h-4 w-5/6' />
+					<div className='flex items-center space-x-3 mt-2'>
+						<Skeleton className='h-4 w-24' />
+						<Skeleton className='h-4 w-8' />
+						<Skeleton className='h-4 w-10' />
+					</div>
+				</div>
 			</div>
 		</div>
 	)

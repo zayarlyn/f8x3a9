@@ -16,8 +16,8 @@ export const todoItemRouter = t.router({
 
 			// const end = performance.now() - start
 			// console.log(end)
-			// return new Promise((resolve) => setTimeout(() => resolve({ data: trips }), 1000))
-			return { data: todoItems }
+			return new Promise((resolve) => setTimeout(() => resolve({ data: todoItems }), 200))
+			// return { data: todoItems }
 		}),
 
 	mutate: t.procedure
