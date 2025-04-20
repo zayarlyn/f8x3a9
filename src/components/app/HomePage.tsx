@@ -53,7 +53,7 @@ const TripList = ({ trips, name }: { name: string; trips: TripSchema[] }) => {
 				items={trips}
 				renderItem={(trip: TripSchema) => {
 					return (
-						<Button asChild key={trip._id} onClick={() => router.push('/trip/' + trip._id)} className='mb-3 p-2 block' size='free' variant='outline'>
+						<Button asChild key={trip._id} onClick={() => router.push('/trips/' + trip._id)} className='mb-3 p-2 block' size='free' variant='outline'>
 							<div className=''>
 								<div className='text-lg mb-1 font-semibold'>{trip.name}</div>
 								<div className='flex gap-2 justify-between'>

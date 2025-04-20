@@ -48,7 +48,7 @@ export default function PlanTripPage() {
 						const err = _.pickBy({ name: !trip.name, dates: !trip.startDate || !trip.endDate })
 						if (!_.isEmpty(err)) return setErrors(err as typeof errors)
 
-						return saveTripMeta({ values: trip }).then((res) => router.replace('/trip/' + res.data._id))
+						return saveTripMeta({ values: trip }).then((res) => router.replace('/trips/' + res.data._id))
 					}}
 					// fullWidth
 				>

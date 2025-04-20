@@ -47,7 +47,8 @@ export const tripRouter = t.router({
 
 			if (!id) {
 				const todoList = new TodoListModel({ name: 'To Visit', tripId: trip._id, userId })
-				const todoItem = new TodoItemModel({ name: 'Visit somewhere', todoListId: todoList.id, userId })
+				const todoItem = new TodoItemModel({ name: 'Visit somewhere', todoListId: todoList._id, userId })
+				todoList.sortOrder = [todoItem._id]
 				await Promise.all([todoList.save(), todoItem.save()])
 			}
 

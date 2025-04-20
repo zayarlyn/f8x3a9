@@ -18,7 +18,7 @@ export default function RootLayout({
 		<TrpcReactQueryCtx>
 			<AlertCtxProvider>
 				<header className='p-4 py-3 fixed top-0 left-0 z-10'>
-					{!['/', '/join'].includes(pathname) && (
+					{!['/trips', '/join'].includes(pathname) && (
 						<Button size='icon' className='rounded-full p-3 border border-gray-300' onClick={() => router.back()} variant='secondary'>
 							<ArrowLeft />
 						</Button>

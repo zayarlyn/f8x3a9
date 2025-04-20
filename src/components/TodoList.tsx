@@ -107,7 +107,7 @@ const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; o
 		<div {...attributes} ref={setNodeRef} style={style}>
 			<Button
 				onClick={reordering ? undefined : () => router.push(pathname + '/todo/' + todo._id)}
-				className={twMerge('block', reordering ? 'select-none' : '', todo.done ? 'text-gray-500' : '')}
+				className={twMerge('block')}
 				asChild
 				variant='outline'
 				fullWidth
@@ -119,16 +119,16 @@ const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; o
 					<div className='flex gap-2 items-start justify-between p-2 pb-0'>
 						<div className={twMerge('truncate py-2 pl-2 select-none flex gap-2 items-start leading-5 font-semibold')}>
 							{/* <MapPinned className='reordering-0' /> */}
-							<p className={twMerge('truncate')}>{todo.name}</p>
+							<p className={twMerge('truncate', reordering ? 'select-none' : '')}>{todo.name}</p>
 							{todo.done && (
-								<Badge variant='outline' className='no-underline'>
+								<Badge variant='default' color='success'>
 									Completed
 								</Badge>
 							)}
 						</div>
 						<div>
 							{reordering ? (
-								<div {...listeners}>
+								<div {...listeners} className='touch-pan-y'>
 									<Button className='p-1' variant='ghost' size='icon-md'>
 										<GripVertical />
 									</Button>
@@ -174,9 +174,6 @@ export const TodoList = ({ todoList, trip, setTrip }: { trip: TripSchema; setTri
 		const sourceTodoIndex = _.findIndex(todoItems, { _id: active.id as string })
 		const targetTodoIndex = _.findIndex(todoItems, { _id: over.id as string })
 
-		// const sourceTodo = _.cloneDeep(todoItems?.[sourceTodoIndex])
-		// const targetTodo = _.cloneDeep(todoItems?.[targetTodoIndex])
-
 		if (!todoItems) return
 		const [sourceTodo] = todoItems.splice(sourceTodoIndex, 1)
 		if (!sourceTodo) return
@@ -187,7 +184,7 @@ export const TodoList = ({ todoList, trip, setTrip }: { trip: TripSchema; setTri
 		localTripData.todoLists[todoListIndex].sortOrder = sortOrder
 
 		setTrip(localTrip)
-		// queryClient.setQueryData(queryKey, localTrip)
+		queryClient.setQueryData(queryKey, localTrip)
 	}
 
 	return (

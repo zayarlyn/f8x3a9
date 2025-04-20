@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 		// if (forwardedHost) return redirect(`http://${forwardedHost}${next}`)
 
 		// we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-		return redirect('/')
+		return redirect('/trips')
 	}
 
 	const supabase = await createClient()

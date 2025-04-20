@@ -1,6 +1,5 @@
 import HomePage from '@me/components/app/HomePage'
 import { Metadata } from 'next'
-import { redirect } from 'next/navigation'
 import React from 'react'
 
 export const metadata: Metadata = {
@@ -8,7 +7,7 @@ export const metadata: Metadata = {
 }
 
 const page = () => {
-	return redirect('/trips')
+	return <HomePage />
 }
 
 export default page
