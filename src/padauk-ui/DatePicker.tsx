@@ -3,7 +3,7 @@ import ReactDatePicker from 'react-datepicker'
 import { cva, VariantProps } from 'class-variance-authority'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useTripStore } from '../trip'
-import Input, { InputProps } from './Input'
+import Input, { InputProps } from '../components/ui/Input'
 
 const inputVariants = cva('relative w-60', { variants: { fullWidth: { true: 'w-full' } } })
 

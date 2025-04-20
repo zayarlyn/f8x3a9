@@ -4,13 +4,13 @@ import { TripSchema } from '@me/backend/models/Trip'
 import { AppRouter } from '@me/backend/trpc/routers/router'
 import { useMyMutation } from '@me/hooks/useMyMutation'
 import Combobox from '@me/padauk-ui/Combobox'
-import Input from '@me/padauk-ui/Input'
-import { queryClient, trpc } from '@me/TrpcReactQueryCtx'
+import { queryClient, trpc } from '@me/contexts/TrpcReactQueryCtx'
 import { inferRouterInputs } from '@trpc/server'
 import _ from 'lodash'
 import { useState } from 'react'
 import { Button } from './ui/button'
 import { Dialog } from './ui/dialog'
+import Input from './ui/Input'
 
 export const TodoItemDialog = ({ trip, todoListId: defaultTodoListId, todo, onClose }: { todo?: TodoItemSchema; trip: TripSchema; todoListId: string; onClose: () => void }) => {
 	const [saveTodoItem] = useMyMutation<inferRouterInputs<AppRouter>['todoItem']['mutate']>(trpc.todoItem.mutate.mutationOptions())

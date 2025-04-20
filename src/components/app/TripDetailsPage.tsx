@@ -5,7 +5,6 @@ import { TripSchema } from '@me/backend/models/Trip'
 import { AppRouter } from '@me/backend/trpc/routers/router'
 import { useMyMutation } from '@me/hooks/useMyMutation'
 import { useQueryState } from '@me/hooks/useQueryState'
-import { queryClient, trpc } from '@me/TrpcReactQueryCtx'
 import { inferRouterInputs } from '@trpc/server'
 import { format } from 'date-fns'
 import _ from 'lodash'
@@ -15,10 +14,10 @@ import { useMemo, useState } from 'react'
 import { TodoList } from '../TodoList'
 import { TodoListDialog } from '../TodoListDialog'
 import { TripMetaDialog } from '../TripMetaDialog'
-import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Progress } from '../ui/progress'
 import { Skeleton } from '../ui/skeleton'
+import { queryClient, trpc } from '@me/contexts/TrpcReactQueryCtx'
 
 export enum ETripStatus {
 	draft = 'draft',
@@ -30,14 +29,18 @@ const TodoLists = ({ trip, setTrip }: { trip: TripSchema; setTrip: any }) => {
 	const [openTodoList, setOpenTodoList] = useState<TodoListSchema>()
 	const [parent] = useAutoAnimate()
 
+	const tripEnded = trip.status === ETripStatus.ended
+
 	return (
 		<div>
 			{openTodoList && <TodoListDialog trip={trip} onClose={() => setOpenTodoList(undefined)} />}
-			<div className='flex justify-end mb-4'>
-				<Button onClick={() => setOpenTodoList({} as TodoListSchema)} variant='link-btn'>
-					Create a list
-				</Button>
-			</div>
+			{!tripEnded && (
+				<div className='flex justify-end mb-4'>
+					<Button onClick={() => setOpenTodoList({} as TodoListSchema)} variant='link-btn'>
+						Create a list
+					</Button>
+				</div>
+			)}
 			<div className='text-gray-500'>
 				{_.map(trip.todoLists, (todoList) => {
 					return <TodoList trip={trip} setTrip={setTrip} todoList={todoList} key={todoList._id} />
@@ -62,7 +65,8 @@ export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any 
 	const doneTodoCount = _.sumBy(trip.todoLists, (t) => _.filter(t.todoItems, (td) => td.done).length)
 	const progress = Math.floor((doneTodoCount / todoCount) * 100)
 	const started = trip.status === ETripStatus.started
-	const canEnd = progress === 100
+
+	const tripEnded = trip.status === ETripStatus.ended
 
 	return (
 		<div className='pb-6'>
@@ -78,7 +82,7 @@ export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any 
 						<span>{format(trip.startDate!, 'yyyy-MMM-dd (eee)')}</span> -<span>{format(trip.endDate!, 'yyyy-MMM-dd (eee)')}</span>
 					</p>
 					{/* <Badge variant='outline'>{trip.status}</Badge> */}
-					{started && (
+					{(started || tripEnded) && (
 						<div className='mt-2'>
 							<div className='flex justify-between items-center mb-1'>
 								<span>Progress</span>
@@ -87,26 +91,32 @@ export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any 
 							<Progress value={progress} />
 						</div>
 					)}
-					<div className='absolute top-0 right-0 m-2'>
-						<Button onClick={() => setOpenTripMetaDialog(true)} variant='ghost' size='icon'>
-							<SquarePen />
-						</Button>
-					</div>
-				</div>
-				<div className='mb-4'>
-					{/* {trip.status === ETripStatus.draft && ( */}
-					<Button onClick={() => handleSaveTrip({ status: trip.status === ETripStatus.draft ? ETripStatus.started : ETripStatus.ended })} fullWidth>
-						{started ? 'End the trip' : 'Start the trip'}
-					</Button>
-					{started && (
-						<>
-							<Button onClick={() => handleSaveTrip({ status: ETripStatus.draft })} className='' variant='link-btn' fullWidth>
-								Cancel the trip
+					{!tripEnded && (
+						<div className='absolute top-0 right-0 m-2'>
+							<Button onClick={() => setOpenTripMetaDialog(true)} variant='ghost' size='icon'>
+								<SquarePen />
 							</Button>
-						</>
+						</div>
 					)}
-					{/* )} */}
 				</div>
+				{tripEnded ? (
+					<div className='my-8'>
+						<p className='text-lg font-semibold text-center'>This trip has ended 🎉</p>
+					</div>
+				) : (
+					<div className='mb-4'>
+						<Button onClick={() => handleSaveTrip({ status: trip.status === ETripStatus.draft ? ETripStatus.started : ETripStatus.ended })} fullWidth>
+							{started ? 'End the trip' : 'Start the trip'}
+						</Button>
+						{started && (
+							<>
+								<Button onClick={() => handleSaveTrip({ status: ETripStatus.draft })} className='' variant='link-btn' fullWidth>
+									Cancel the trip
+								</Button>
+							</>
+						)}
+					</div>
+				)}
 				<div className='flex flex-col gap-2 mb-20'>
 					<TodoLists trip={trip} setTrip={setTrip} />
 				</div>
@@ -126,88 +136,82 @@ const LoadingSkeleton = () => {
 				</div>
 			</div>
 
-			{/* Trip details card */}
-			<div className='px-4 -mt-6 z-10'>
-				<div className='bg-white rounded-lg p-4 border border-gray-300'>
-					<div className='flex justify-between items-start mb-4'>
-						<Skeleton className='h-7 w-32' />
-						<Skeleton className='h-6 w-6' />
-					</div>
-					<Skeleton className='h-4 w-64 mb-4' />
-
-					{/* Progress section */}
-					<div className='mb-4'>
-						<div className='flex justify-between mb-1'>
-							<Skeleton className='h-4 w-20' />
-							<Skeleton className='h-4 w-12' />
+			<div className='my-width z-10'>
+				{/* Trip details card */}
+				<div className='-mt-6'>
+					<div className='bg-white rounded-lg p-4 border border-gray-300'>
+						<div className='flex justify-between items-start mb-4'>
+							<Skeleton className='h-7 w-32' />
+							<Skeleton className='h-6 w-6' />
 						</div>
-						<Skeleton className='h-2 w-full rounded-full' />
-					</div>
+						<Skeleton className='h-4 w-64 mb-4' />
 
-					{/* Action buttons */}
-					<Skeleton className='h-12 w-full rounded-md mb-2' />
-					<div className='flex justify-center'>
-						<Skeleton className='h-4 w-28' />
-					</div>
-				</div>
-			</div>
+						{/* Progress section */}
+						<div className='mb-4'>
+							<div className='flex justify-between mb-1'>
+								<Skeleton className='h-4 w-20' />
+								<Skeleton className='h-4 w-12' />
+							</div>
+							<Skeleton className='h-2 w-full rounded-full' />
+						</div>
 
-			{/* Create a list button */}
-			<div className='flex justify-end px-4 mt-4'>
-				<Skeleton className='h-4 w-24' />
-			</div>
-
-			{/* To Explore tomorrow section */}
-			<div className='px-4 mt-6'>
-				<div className='flex justify-between items-center mb-4'>
-					<Skeleton className='h-5 w-40' />
-					<div className='flex items-center'>
-						<Skeleton className='h-4 w-16 mr-2' />
-						<Skeleton className='h-6 w-6' />
+						{/* Action buttons */}
+						<Skeleton className='h-12 w-full rounded-md mb-2' />
+						<div className='flex justify-center'>
+							<Skeleton className='h-4 w-28' />
+						</div>
 					</div>
 				</div>
-
-				{/* List items */}
-				{[1, 2, 3].map((i) => (
-					<div key={`explore-${i}`} className='border-b py-4 flex justify-between items-center'>
-						<Skeleton className='h-5 w-48' />
-						<Skeleton className='h-6 w-6 rounded-full' />
-					</div>
-				))}
-
-				{/* Add a place */}
-				<div className='mt-4'>
+				{/* Create a list button */}
+				<div className='flex justify-end mt-4'>
 					<Skeleton className='h-4 w-24' />
 				</div>
-			</div>
+				{/* To Explore tomorrow section */}
+				<div className='mt-6'>
+					<div className='flex justify-between items-center mb-4'>
+						<Skeleton className='h-5 w-40' />
+						<div className='flex items-center'>
+							<Skeleton className='h-4 w-16 mr-2' />
+							<Skeleton className='h-6 w-6' />
+						</div>
+					</div>
 
-			{/* Internships section */}
-			<div className='px-4 mt-8'>
-				<div className='flex justify-between items-center mb-4'>
-					<Skeleton className='h-5 w-24' />
-					<div className='flex items-center'>
-						<Skeleton className='h-4 w-16 mr-2' />
-						<Skeleton className='h-6 w-6' />
+					{/* List items */}
+					{[1, 2, 3].map((i) => (
+						<div key={`explore-${i}`} className='border-b py-4 flex justify-between items-center'>
+							<Skeleton className='h-5 w-48' />
+							<Skeleton className='h-6 w-6 rounded-full' />
+						</div>
+					))}
+
+					{/* Add a place */}
+					<div className='mt-4'>
+						<Skeleton className='h-4 w-24' />
 					</div>
 				</div>
-
-				{/* List items */}
-				{[1, 2, 3, 4].map((i) => (
-					<div key={`internship-${i}`} className='border-b py-4 flex justify-between items-center'>
-						<Skeleton className='h-5 w-36' />
-						<Skeleton className='h-6 w-6 rounded-full' />
+				{/* Internships section */}
+				<div className='mt-8'>
+					<div className='flex justify-between items-center mb-4'>
+						<Skeleton className='h-5 w-24' />
+						<div className='flex items-center'>
+							<Skeleton className='h-4 w-16 mr-2' />
+							<Skeleton className='h-6 w-6' />
+						</div>
 					</div>
-				))}
 
-				{/* Add a place */}
-				<div className='mt-4'>
-					<Skeleton className='h-4 w-24' />
+					{/* List items */}
+					{[1, 2, 3, 4].map((i) => (
+						<div key={`internship-${i}`} className='border-b py-4 flex justify-between items-center'>
+							<Skeleton className='h-5 w-36' />
+							<Skeleton className='h-6 w-6 rounded-full' />
+						</div>
+					))}
+
+					{/* Add a place */}
+					<div className='mt-4'>
+						<Skeleton className='h-4 w-24' />
+					</div>
 				</div>
-			</div>
-
-			{/* Profile button */}
-			<div className='fixed bottom-4 left-4'>
-				<Skeleton className='h-10 w-10 rounded-full' />
 			</div>
 		</div>
 	)

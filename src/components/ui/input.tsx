@@ -1,21 +1,72 @@
-import * as React from "react"
+import { cva, VariantProps } from 'class-variance-authority'
+import _ from 'lodash'
+import { CircleX } from 'lucide-react'
+import { ChangeEvent, useCallback } from 'react'
+import { twMerge } from 'tailwind-merge'
+import { IconButton } from '../../padauk-ui/Button'
+import TextareaAutosize from 'react-textarea-autosize'
 
-import { cn } from "@me/lib/utils"
+const inputVariants = cva('relative w-60', { variants: { fullWidth: { true: 'w-full' } } })
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className
-      )}
-      {...props}
-    />
-  )
+export interface InputProps extends VariantProps<typeof inputVariants> {
+	value?: string
+	onChange?: (v: string) => void
+	onClick?: (e: any) => void
+	placeholder?: string
+	error?: string
+	multiline?: boolean
+	type?: string
 }
 
-export { Input }
+const Input = (props: InputProps) => {
+	const { value, error, onChange, onClick, placeholder, multiline = false, fullWidth, type } = props
+	const className = inputVariants({ ..._.omit(props, 'error') })
+
+	const handleOnChange = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const newValue = e.target.value
+			if (onChange) onChange(newValue)
+		},
+		[onChange]
+	)
+
+	const inputClassName = 'text-black peer pt-4 pb-1.5 pl-4 pr-10  outline-1 outline-gray-300 rounded-md focus:outline-[1.5px] focus:outline-gray-800 w-full block'
+
+	return (
+		<div>
+			<div className={className} onClick={onClick}>
+				{multiline ? (
+					<TextareaAutosize
+						placeholder=''
+						minRows={3}
+						className={twMerge('resize-none', inputClassName, placeholder ? '' : 'pt-3 pb-3', error ? 'outline-red-400 focus:outline-red-400' : '')}
+						value={value}
+						onChange={handleOnChange as any}
+					/>
+				) : (
+					<input
+						value={value}
+						onChange={handleOnChange}
+						placeholder=''
+						className={twMerge(inputClassName, placeholder ? '' : 'pt-3 pb-4', error ? 'outline-red-400 focus:outline-red-400' : '')}
+						type={type}
+					/>
+				)}
+
+				{placeholder && (
+					<span className='duration-200 peer-focus:text-[12px] peer-focus:top-2.5 peer-placeholder-shown:text-base peer-placeholder-shown:top-5.5 left-4 absolute top-2.5 -translate-y-1/2 text-[12px] text-gray-400 select-none pointer-events-none'>
+						{placeholder}
+					</span>
+				)}
+				{value && (
+					<IconButton onClick={() => onChange?.('')} className='absolute right-0 top-0.5 bg-white'>
+						<CircleX className='text-gray-500' />
+					</IconButton>
+				)}
+			</div>
+			{error && <span className='block text-sm leading-4 text-red-400 pl-3 mt-1'>*{error}</span>}
+		</div>
+	)
+}
+
+export default Input

@@ -4,9 +4,10 @@ import { ArrowRight, Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card'
-import { Input } from '../ui/input'
+// import { Input } from '../ui/input'
 import { Separator } from '../ui/separator'
 import Logo from '../Logo'
+import Input from '../ui/Input'
 
 export default function SignIn() {
 	const [email, setEmail] = useState('')
@@ -74,7 +75,7 @@ export default function SignIn() {
 
 							<form onSubmit={handleMagicLinkSignIn} className='space-y-4'>
 								<div className='space-y-2'>
-									<Input type='email' placeholder='name@example.com' value={email} onChange={(e) => setEmail(e.target.value)} required disabled={isLoading} />
+									<Input type='email' placeholder='name@example.com' value={email} onChange={setEmail} fullWidth />
 								</div>
 								<Button type='submit' className='w-full' disabled={isLoading || !email || isGoogleLoading}>
 									{isLoading ? (
@@ -117,7 +118,7 @@ export default function SignIn() {
 						</div>
 					)}
 				</CardContent>
-				<CardFooter className='flex flex-col space-y-4 border-t pt-4'>
+				{/* <CardFooter className='flex flex-col space-y-4 border-t pt-4'>
 					<div className='text-xs text-center text-muted-foreground'>
 						By continuing, you agree to our{' '}
 						<a href='#' className='underline underline-offset-4 hover:text-primary'>
@@ -129,7 +130,7 @@ export default function SignIn() {
 						</a>
 						.
 					</div>
-				</CardFooter>
+				</CardFooter> */}
 			</Card>
 		</div>
 	)

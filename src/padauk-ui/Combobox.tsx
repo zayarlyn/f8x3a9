@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { MouseEvent, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
-import Input, { InputProps } from './Input'
+import Input, { InputProps } from '../components/ui/Input'
 import Popper from './Popper'
 
 interface IProps extends InputProps {

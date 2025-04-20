@@ -4,15 +4,16 @@ import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { TodoItemSchema } from '@me/backend/models/TodoItem'
 import { useMyMutation } from '@me/hooks/useMyMutation'
 import { useQueryState } from '@me/hooks/useQueryState'
-import Input from '@me/padauk-ui/Input'
-import { queryClient, trpc } from '@me/TrpcReactQueryCtx'
+import { queryClient, trpc } from '@me/contexts/TrpcReactQueryCtx'
 import Linkify from 'linkify-react'
 import _ from 'lodash'
 import { Edit } from 'lucide-react'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
+import Input from '../ui/Input'
+import { useAlert } from '@me/contexts/AlertCtx'
 
 interface ITodoDetail {
 	todoItem: TodoItemSchema
@@ -21,6 +22,8 @@ interface ITodoDetail {
 
 const TodoDetail = ({ todoItem, setTodoItem }: ITodoDetail) => {
 	const [parent] = useAutoAnimate()
+	const { alertConfirm } = useAlert()
+	const router = useRouter()
 
 	const [errors, setErrors] = useState({ name: false })
 	const [isEditing, setIsEditing] = useState(false)
@@ -29,12 +32,13 @@ const TodoDetail = ({ todoItem, setTodoItem }: ITodoDetail) => {
 
 	if (!todoItem) return null
 
-	const handleSave = (obj: Partial<TodoItemSchema>) => {
+	const handleSave = ({ deletedAt, ...obj }: Partial<TodoItemSchema> | { deletedAt: boolean }) => {
 		const err = _.pickBy({ name: !todoItem.name })
 		if (!_.isEmpty(err)) return setErrors(err as typeof errors)
-		return saveTodoItem({ id: todoItem._id, values: obj }).then(() => {
+		return saveTodoItem({ id: todoItem._id, values: obj, deletedAt }).then(() => {
 			queryClient.invalidateQueries(trpc.todoItem.query.queryOptions({ id: todoItem._id }))
 			setIsEditing(false)
+			if (deletedAt) router.back()
 		})
 	}
 
@@ -44,9 +48,19 @@ const TodoDetail = ({ todoItem, setTodoItem }: ITodoDetail) => {
 				{isEditing ? (
 					<div className='flex flex-col gap-4'>
 						<div className='flex items-center gap-2 justify-end'>
-							{/* <Buton className='text-black' onClick={() => handleSave({ deletedAt: true })} variant='link-btn'>
+							<Button
+								className='text-red-500'
+								onClick={() =>
+									alertConfirm().then((result) => {
+										if (result) {
+											return handleSave({ deletedAt: true })
+										}
+									})
+								}
+								variant='link-btn'
+							>
 								Delete
-							</Buton> */}
+							</Button>
 							<Button onClick={() => handleSave(_.pick(todoItem, ['name', 'description']))} variant='link-btn'>
 								Save
 							</Button>

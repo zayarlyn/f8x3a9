@@ -5,7 +5,7 @@ import { TodoListSchema } from '@me/backend/models/TodoList'
 import { TripSchema } from '@me/backend/models/Trip'
 import { AppRouter } from '@me/backend/trpc/routers/router'
 import { useMyMutation } from '@me/hooks/useMyMutation'
-import { queryClient, trpc } from '@me/TrpcReactQueryCtx'
+import { queryClient, trpc } from '@me/contexts/TrpcReactQueryCtx'
 import { inferRouterInputs } from '@trpc/server'
 import _ from 'lodash'
 import { Circle, CircleCheck, GripVertical, SquarePen } from 'lucide-react'
@@ -21,6 +21,7 @@ import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers'
+import { Badge } from './ui/badge'
 
 const placeApiResponse = {
 	predictions: [
@@ -106,7 +107,7 @@ const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; o
 		<div {...attributes} ref={setNodeRef} style={style}>
 			<Button
 				onClick={reordering ? undefined : () => router.push(pathname + '/todo/' + todo._id)}
-				className={twMerge('block', todo.done ? 'text-gray-500' : '', todo.done ? 'line-through' : '')}
+				className={twMerge('block', reordering ? 'select-none' : '', todo.done ? 'text-gray-500' : '')}
 				asChild
 				variant='outline'
 				fullWidth
@@ -118,7 +119,12 @@ const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; o
 					<div className='flex gap-2 items-start justify-between p-2 pb-0'>
 						<div className={twMerge('truncate py-2 pl-2 select-none flex gap-2 items-start leading-5 font-semibold')}>
 							{/* <MapPinned className='reordering-0' /> */}
-							<p className='truncate'>{todo.name}</p>
+							<p className={twMerge('truncate')}>{todo.name}</p>
+							{todo.done && (
+								<Badge variant='outline' className='no-underline'>
+									Completed
+								</Badge>
+							)}
 						</div>
 						<div>
 							{reordering ? (
@@ -150,9 +156,10 @@ export const TodoList = ({ todoList, trip, setTrip }: { trip: TripSchema; setTri
 	const [openCreateTodo, setOpenCreateTodo] = useState(false)
 	const [openTodo, setOpenTodo] = useState<TodoItemSchema>()
 	const [openTodoList, setOpenTodoList] = useState<TodoListSchema>()
-	const [parent, enableAnimations] = useAutoAnimate(/* optional config */)
 	const [reordering, setReordering] = useState(false)
 	const [saveTodoList] = useMyMutation<inferRouterInputs<AppRouter>['todoList']['mutate']>(trpc.todoList.mutate.mutationOptions())
+
+	const tripEnded = trip.status === ETripStatus.ended
 
 	const handleDragEnd = (e: DragEndEvent) => {
 		const { active, over } = e
@@ -180,7 +187,7 @@ export const TodoList = ({ todoList, trip, setTrip }: { trip: TripSchema; setTri
 		localTripData.todoLists[todoListIndex].sortOrder = sortOrder
 
 		setTrip(localTrip)
-		queryClient.setQueryData(queryKey, localTrip)
+		// queryClient.setQueryData(queryKey, localTrip)
 	}
 
 	return (
@@ -189,42 +196,51 @@ export const TodoList = ({ todoList, trip, setTrip }: { trip: TripSchema; setTri
 			{openTodo && <TodoItemDialog todo={openTodo} trip={trip} todoListId={todoList._id!} onClose={() => setOpenTodo(undefined)} />}
 			{openTodoList && <TodoListDialog trip={trip} todoList={todoList} onClose={() => setOpenTodoList(undefined)} />}
 			<div className={twMerge('flex justify-between items-center', todoList.todoItems.length ? 'mb-2' : '')}>
-				<h2 className='font-medium '>{todoList.name}</h2>
-				<div className='flex items-center'>
-					<Button
-						onClick={() => {
-							setReordering((p) => !p)
-							if (reordering) return saveTodoList({ id: todoList._id, values: { sortOrder: todoList.sortOrder } })
-						}}
-						variant='link-btn'
-						className='-mt-1'
-					>
-						{reordering ? 'Save' : 'Reorder'}
-					</Button>
-					<Button variant='ghost' size='icon' onClick={() => setOpenTodoList(todoList)} className='text-black p-2'>
-						<SquarePen />
-					</Button>
+				<div className='flex items-center gap-2'>
+					<h2 className='font-medium '>{todoList.name}</h2>
+					<Badge variant='default'>{todoList.todoItems.length}</Badge>
 				</div>
+				{!tripEnded && !!todoList.todoItems.length && (
+					<div className='flex items-center'>
+						<Button
+							onClick={() => {
+								setReordering((p) => !p)
+								if (reordering) return saveTodoList({ id: todoList._id, values: { sortOrder: todoList.sortOrder } })
+							}}
+							variant='link-btn'
+							className='-mt-1'
+						>
+							{reordering ? 'Save' : 'Reorder'}
+						</Button>
+						<Button variant='ghost' size='icon' onClick={() => setOpenTodoList(todoList)} className='text-black p-2'>
+							<SquarePen />
+						</Button>
+					</div>
+				)}
 			</div>
 			<DndContext onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis, restrictToParentElement]}>
 				<SortableContext items={_.map(todoList.todoItems, (t) => ({ ...t, id: t._id }))} strategy={verticalListSortingStrategy}>
-					<List ref={parent} className='flex flex-col mb-1 gap-2' itemCount={todoList.todoItems?.length}>
-						{_.map(todoList.todoItems, (todo) => {
+					<List
+						className='flex flex-col mb-1 gap-2'
+						items={todoList.todoItems}
+						renderItem={(todo: TodoItemSchema) => {
 							return <TodoItem reordering={reordering} key={todo._id} todo={todo} trip={trip} isEditing={isEditing} onClick={() => setOpenTodo(todo)} />
-						})}
-					</List>
+						}}
+					/>
 				</SortableContext>
 			</DndContext>
-			<Button
-				onClick={() => {
-					setOpenCreateTodo(true)
-				}}
-				variant='link-btn'
-				className='flex gap-2'
-			>
-				{/* <PlusCircle /> */}
-				Add a place
-			</Button>
+			{!tripEnded && (
+				<Button
+					onClick={() => {
+						setOpenCreateTodo(true)
+					}}
+					variant='link-btn'
+					className='flex gap-2'
+				>
+					{/* <PlusCircle /> */}
+					Create an item
+				</Button>
+			)}
 		</div>
 	)
 }

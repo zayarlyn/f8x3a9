@@ -2,7 +2,7 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { TripSchema } from '@me/backend/models/Trip'
 import { useQueryState } from '@me/hooks/useQueryState'
-import { trpc } from '@me/TrpcReactQueryCtx'
+import { trpc } from '@me/contexts/TrpcReactQueryCtx'
 import { addDays, format } from 'date-fns'
 import _ from 'lodash'
 import { useRouter } from 'next/navigation'
@@ -11,11 +11,30 @@ import Logo from '../Logo'
 import { Button } from '../ui/button'
 import { ETripStatus } from './TripDetailsPage'
 import { Skeleton } from '../ui/skeleton'
+import { useState } from 'react'
 
-export const List = ({ children, className, itemCount, ...props }: any) => {
+export const List = ({ children, className, renderItem, items = [], initialCount, ...props }: any) => {
+	const [parent, enableAnimations] = useAutoAnimate(/* optional config */)
+	const [maxShown, setMaxShown] = useState(initialCount)
+
+	const itemCount = items.length
+
+	console.log({ initialCount, maxShown, itemCount })
+
 	return (
-		<div {...props} className={twMerge('', className)}>
-			{itemCount ? children : <span className='text-center text-gray-600'>List is empty</span>}
+		<div {...props} ref={parent} className={twMerge('', className)}>
+			{itemCount ? (
+				_.map(_.slice(items, 0, maxShown || itemCount), (item) => {
+					return renderItem(item)
+				})
+			) : (
+				<span className='text-center text-gray-600'>List is empty</span>
+			)}
+			{!!itemCount && itemCount > initialCount && (
+				<Button onClick={() => setMaxShown(maxShown === itemCount ? initialCount : itemCount)} variant='link-btn' className='-mt-2'>
+					{maxShown === itemCount ? 'Show less' : 'Show more'}
+				</Button>
+			)}
 		</div>
 	)
 }
@@ -30,11 +49,12 @@ const TripList = ({ trips, name }: { name: string; trips: TripSchema[] }) => {
 				<span className='font-semibold'>{name}</span>
 			</div>
 
-			<List ref={parent} className='flex flex-col mb-4' itemCount={trips.length}>
-				{_.map(trips, (trip) => {
+			<List
+				initialCount={4}
+				className='flex flex-col mb-6'
+				items={trips}
+				renderItem={(trip: TripSchema) => {
 					return (
-						// <Skeleton key={trip._id} loading={isLoading}>
-
 						<Button asChild key={trip._id} onClick={() => router.push('/trip/' + trip._id)} className='mb-3 p-2 block' size='free' variant='outline'>
 							<div className=''>
 								<div className='text-lg mb-1 font-semibold'>{trip.name}</div>
@@ -49,8 +69,8 @@ const TripList = ({ trips, name }: { name: string; trips: TripSchema[] }) => {
 						</Button>
 						// </Skeleton>
 					)
-				})}
-			</List>
+				}}
+			/>
 			{/* )} */}
 		</div>
 	)
@@ -138,6 +158,7 @@ const Trips = ({ trips }: { trips: TripSchema[] }) => {
 				</div>
 				<TripList name='Started' trips={_.filter(trips, { status: ETripStatus.started })} />
 				<TripList name='Upcoming' trips={_.filter(trips, { status: ETripStatus.draft })} />
+				<TripList name='Ended' trips={_.filter(trips, { status: ETripStatus.ended })} />
 			</div>
 		</div>
 	)

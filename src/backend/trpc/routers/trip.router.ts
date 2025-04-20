@@ -29,8 +29,8 @@ export const tripRouter = t.router({
 
 			const end = performance.now() - start
 			console.log(end)
-			return new Promise((resolve) => setTimeout(() => resolve({ data: trips }), 200))
-			// return { data: trips }
+			// return new Promise((resolve) => setTimeout(() => resolve({ data: trips }), 200))
+			return { data: trips }
 		}),
 
 	mutate: t.procedure
