@@ -12,7 +12,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { Skeleton } from '../ui/skeleton'
-import Input from '../ui/Input'
+import { Input } from '../ui/Input'
 import { useAlert } from '@me/contexts/AlertCtx'
 
 interface ITodoDetail {

@@ -10,7 +10,7 @@ import _ from 'lodash'
 import { useState } from 'react'
 import { Button } from './ui/button'
 import { Dialog } from './ui/dialog'
-import Input from './ui/Input'
+import { Input } from './ui/Input'
 
 export const TodoListDialog = ({ trip, todoList, onClose }: { todoList?: TodoListSchema; trip: TripSchema; onClose: () => void }) => {
 	const [saveTodoList] = useMyMutation<inferRouterInputs<AppRouter>['todoList']['mutate']>(trpc.todoList.mutate.mutationOptions())

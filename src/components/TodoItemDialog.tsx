@@ -3,14 +3,14 @@ import { TodoItemSchema } from '@me/backend/models/TodoItem'
 import { TripSchema } from '@me/backend/models/Trip'
 import { AppRouter } from '@me/backend/trpc/routers/router'
 import { useMyMutation } from '@me/hooks/useMyMutation'
-import Combobox from '@me/padauk-ui/Combobox'
+// import Combobox from '@me/padauk-ui/Combobox'
 import { queryClient, trpc } from '@me/contexts/TrpcReactQueryCtx'
 import { inferRouterInputs } from '@trpc/server'
 import _ from 'lodash'
 import { useState } from 'react'
 import { Button } from './ui/button'
 import { Dialog } from './ui/dialog'
-import Input from './ui/Input'
+import { Input } from './ui/Input'
 
 export const TodoItemDialog = ({ trip, todoListId: defaultTodoListId, todo, onClose }: { todo?: TodoItemSchema; trip: TripSchema; todoListId: string; onClose: () => void }) => {
 	const [saveTodoItem] = useMyMutation<inferRouterInputs<AppRouter>['todoItem']['mutate']>(trpc.todoItem.mutate.mutationOptions())
@@ -34,13 +34,13 @@ export const TodoItemDialog = ({ trip, todoListId: defaultTodoListId, todo, onCl
 			<Dialog.Header onClose={onClose}>{trip._id ? 'Todo' : 'Create a Todo'}</Dialog.Header>
 			<Dialog.Content>
 				<div className='flex flex-col gap-4'>
-					<Combobox
+					{/* <Combobox
 						value={todoListId}
 						onChange={setTodoListId}
 						placeholder='List'
 						options={_.map(trip.todoLists, (list) => ({ value: list._id!, label: list.name }))}
 						error={errors.todoListId ? 'List is required' : ''}
-					/>
+					/> */}
 					<Input value={name} onChange={setName} placeholder='Name' error={errors.name ? 'Name is required' : ''} fullWidth />
 				</div>
 			</Dialog.Content>

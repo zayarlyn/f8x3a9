@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 // import { Input } from '../ui/input'
 import { Separator } from '../ui/separator'
 import Logo from '../Logo'
-import Input from '../ui/Input'
+import { Input } from '../ui/Input'
 
 export default function SignIn() {
 	const [email, setEmail] = useState('')

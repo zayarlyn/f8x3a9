@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { Button } from '../ui/button'
 import { DateRangePicker } from './DateRangePicker'
-import Input from '../ui/Input'
+import { Input } from '../ui/Input'
 
 export default function PlanTripPage() {
 	const router = useRouter()

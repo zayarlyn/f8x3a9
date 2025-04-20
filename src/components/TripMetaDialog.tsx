@@ -11,7 +11,7 @@ import { useState } from 'react'
 import { DateRangePicker } from './app/DateRangePicker'
 import { Button } from './ui/button'
 import { Dialog } from './ui/dialog'
-import Input from './ui/Input'
+import { Input } from './ui/Input'
 // import {  } from '@trpc/client'
 
 export const TripMetaDialog = ({ trip: dbTrip, onClose }: { todoList?: TodoListSchema; trip: TripSchema; onClose: () => void }) => {

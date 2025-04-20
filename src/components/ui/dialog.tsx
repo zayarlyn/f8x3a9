@@ -5,7 +5,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { X, XIcon } from 'lucide-react'
 
 import { cn } from '@me/lib/utils'
-import { IconButton } from '@me/padauk-ui'
+import { Button } from './button'
 
 function Dialog({ children, ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
 	return (
@@ -85,7 +85,9 @@ function DialogHeader({ className, children, onClose, ...props }: IDialogTitle) 
 		<DialogPrimitive.Title data-slot='dialog-title' className={cn('border-b border-b-gray-300 p-4 py-3 flex items-center justify-between', className)} {...props}>
 			<span className='font-semibold'>{children}</span>
 			{/* <DialogPrimitive.Close> */}
-			<IconButton onClick={onClose} icon={X} className='p-1' variant='transparent' />
+			<Button onClick={onClose} className='p-1' variant='link-btn' size='icon'>
+				<X />
+			</Button>
 			{/* </DialogPrimitive.Close> */}
 		</DialogPrimitive.Title>
 	)

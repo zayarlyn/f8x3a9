@@ -3,8 +3,8 @@ import _ from 'lodash'
 import { CircleX } from 'lucide-react'
 import { ChangeEvent, useCallback } from 'react'
 import { twMerge } from 'tailwind-merge'
-import { IconButton } from '../../padauk-ui/Button'
 import TextareaAutosize from 'react-textarea-autosize'
+import { Button } from './button'
 
 const inputVariants = cva('relative w-60', { variants: { fullWidth: { true: 'w-full' } } })
 
@@ -18,7 +18,7 @@ export interface InputProps extends VariantProps<typeof inputVariants> {
 	type?: string
 }
 
-const Input = (props: InputProps) => {
+export const Input = (props: InputProps) => {
 	const { value, error, onChange, onClick, placeholder, multiline = false, fullWidth, type } = props
 	const className = inputVariants({ ..._.omit(props, 'error') })
 
@@ -59,14 +59,12 @@ const Input = (props: InputProps) => {
 					</span>
 				)}
 				{value && (
-					<IconButton onClick={() => onChange?.('')} className='absolute right-0 top-0.5 bg-white'>
+					<Button variant='link-btn' size='icon' onClick={() => onChange?.('')} className='absolute right-0 top-0.5 bg-white'>
 						<CircleX className='text-gray-500' />
-					</IconButton>
+					</Button>
 				)}
 			</div>
 			{error && <span className='block text-sm leading-4 text-red-400 pl-3 mt-1'>*{error}</span>}
 		</div>
 	)
 }
-
-export default Input

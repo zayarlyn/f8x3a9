@@ -19,8 +19,6 @@ export const List = ({ children, className, renderItem, items = [], initialCount
 
 	const itemCount = items.length
 
-	console.log({ initialCount, maxShown, itemCount })
-
 	return (
 		<div {...props} ref={parent} className={twMerge('', className)}>
 			{itemCount ? (
@@ -142,7 +140,7 @@ const Trips = ({ trips }: { trips: TripSchema[] }) => {
 
 	return (
 		<div className=''>
-			<header className='py-2 px-4 flex items-center justify-between border-b border-b-gray-300 sticky top-0 bg-white'>
+			<header className='py-2 px-4 flex items-center justify-between border-b border-b-gray-300 sticky top-0 bg-white z-10'>
 				<Logo />
 				<Button onClick={handleSignOut} variant='link-btn' size='sm'>
 					Sign Out
