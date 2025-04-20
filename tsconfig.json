@@ -16,6 +16,7 @@
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"strictPropertyInitialization": false,
+		"forceConsistentCasingInFileNames": true,
 		"plugins": [
 			{
 				"name": "next"
