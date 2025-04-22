@@ -1,10 +1,16 @@
 import { prop, ReturnModelType } from '@typegoose/typegoose'
-import { IsBoolean, IsOptional, IsString } from 'class-validator'
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator'
 import { BaseSchema } from './BaseModel'
 import { getOrRegisterModel } from '../mongoose'
 import { Types } from 'mongoose'
 
 export const TODO_ITEM_COLLECTION = 'todoItem'
+
+export enum ETodoItemStatus {
+	pending = 'pending',
+	done = 'done',
+	dropped = 'dropped',
+}
 
 export class TodoItemSchema extends BaseSchema {
 	@IsString()
@@ -16,9 +22,14 @@ export class TodoItemSchema extends BaseSchema {
 	@prop({ type: String, default: '' })
 	description: string
 
-	@IsBoolean()
-	@prop({ type: Boolean, default: false })
-	done: boolean
+	// deprecated
+	// @IsBoolean()
+	// @prop({ type: Boolean, default: false })
+	// done: boolean
+
+	@IsEnum(ETodoItemStatus)
+	@prop({ type: String, enum: ETodoItemStatus, default: ETodoItemStatus.pending })
+	status: ETodoItemStatus
 
 	@IsString()
 	@IsOptional()

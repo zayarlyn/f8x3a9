@@ -49,6 +49,11 @@ const TodoLists = ({ trip, setTrip }: { trip: TripSchema; setTrip: any }) => {
 		</div>
 	)
 }
+export enum ETodoItemStatus {
+	pending = 'pending',
+	done = 'done',
+	dropped = 'dropped',
+}
 
 export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any }) => {
 	const [openTripMetaDialog, setOpenTripMetaDialog] = useState(false)
@@ -62,7 +67,7 @@ export const TripDetails = ({ trip, setTrip }: { trip: TripSchema; setTrip: any 
 	}
 
 	const todoCount = _.sumBy(trip.todoLists, (t) => t.todoItems.length) || 1
-	const doneTodoCount = _.sumBy(trip.todoLists, (t) => _.filter(t.todoItems, (td) => td.done).length)
+	const doneTodoCount = _.sumBy(trip.todoLists, (t) => _.filter(t.todoItems, (td) => td.status === ETodoItemStatus.done).length)
 	const progress = Math.floor((doneTodoCount / todoCount) * 100)
 	const started = trip.status === ETripStatus.started
 

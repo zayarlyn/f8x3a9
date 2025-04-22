@@ -15,7 +15,7 @@ import { twMerge } from 'tailwind-merge'
 import { TodoItemDialog } from './TodoItemDialog'
 import { TodoListDialog } from './TodoListDialog'
 import { Button } from './ui/button'
-import { ETripStatus } from './app/TripDetailsPage'
+import { ETodoItemStatus, ETripStatus } from './app/TripDetailsPage'
 import { List } from './app/HomePage'
 import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
@@ -93,7 +93,7 @@ const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; o
 		const todoIndex = _.findIndex(localTrip?.data[0].todoLists[todoListIndex].todoItems, { _id: todo._id })
 		localTrip!.data[0].todoLists[todoListIndex].todoItems[todoIndex] = { ...todo, ...obj } as TodoItemSchema
 		queryClient.setQueryData(queryKey, localTrip)
-		return saveTodoItem({ id: todo._id, values: { done: obj.done } })
+		return saveTodoItem({ id: todo._id, values: obj })
 	}
 
 	const started = trip.status === ETripStatus.started
@@ -102,6 +102,8 @@ const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; o
 		transform: CSS.Transform.toString(transform),
 		transition,
 	}
+
+	const isDone = todo.status === ETodoItemStatus.done
 
 	return (
 		<div {...attributes} ref={setNodeRef} style={style}>
@@ -120,7 +122,7 @@ const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; o
 						<div className={twMerge('truncate py-2 pl-2 select-none flex gap-2 items-start leading-5 font-semibold')}>
 							{/* <MapPinned className='reordering-0' /> */}
 							<p className={twMerge('truncate', reordering ? 'select-none' : '')}>{todo.name}</p>
-							{todo.done && (
+							{isDone && (
 								<Badge variant='default' color='success'>
 									Completed
 								</Badge>
@@ -134,8 +136,8 @@ const TodoItem = ({ onClick, todo, trip, reordering }: { reordering?: boolean; o
 									</Button>
 								</div>
 							) : started ? (
-								<Button className='p-1' size='icon' variant='ghost' onClick={() => onChange({ done: !todo.done })}>
-									{todo.done ? <CircleCheck /> : <Circle />}
+								<Button className='p-1' size='icon' variant='ghost' onClick={() => onChange({ status: isDone ? ETodoItemStatus.pending : ETodoItemStatus.done })}>
+									{isDone ? <CircleCheck /> : <Circle />}
 								</Button>
 							) : null}
 						</div>
