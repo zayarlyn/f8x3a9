@@ -5,6 +5,7 @@ import { AlertCtxProvider } from '@me/contexts/AlertCtx'
 import { TrpcReactQueryCtx } from '@me/contexts/TrpcReactQueryCtx'
 import { ArrowLeft } from 'lucide-react'
 import { usePathname, useRouter } from 'next/navigation'
+import { VercelToolbar } from '@vercel/toolbar/next'
 
 export default function RootLayout({
 	children,
@@ -13,6 +14,8 @@ export default function RootLayout({
 }>) {
 	const pathname = usePathname()
 	const router = useRouter()
+
+	const shouldInjectToolbar = process.env.NODE_ENV === 'development'
 
 	return (
 		<TrpcReactQueryCtx>
@@ -26,6 +29,7 @@ export default function RootLayout({
 				</header>
 				<div>{children}</div>
 				<Toaster />
+				{shouldInjectToolbar && <VercelToolbar />}
 			</AlertCtxProvider>
 		</TrpcReactQueryCtx>
 	)

@@ -16,6 +16,7 @@ const setup = async () => {
 		const records = await TodoItemModel.find({ _id: { $ne: null } }, {})
 
 		for (const record of records) {
+			//  need todoItem.done key to run this
 			// @ts-ignore
 			await TodoItemModel.findByIdAndUpdate(record._id, { $unset: { done: true }, status: record.done ? ETodoItemStatus.done : ETodoItemStatus.pending })
 		}

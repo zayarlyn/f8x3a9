@@ -29,6 +29,7 @@
 		"@trpc/server": "^11.0.0-rc.833",
 		"@trpc/tanstack-react-query": "^11.0.0-rc.833",
 		"@typegoose/typegoose": "^12.14.0",
+		"@vercel/toolbar": "^0.1.36",
 		"class-transformer": "^0.5.1",
 		"class-validator": "^0.14.1",
 		"class-variance-authority": "^0.7.1",

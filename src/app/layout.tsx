@@ -9,7 +9,9 @@ const quicksand = Quicksand({
 
 export const metadata: Metadata = {
 	title: 'Yolo Travel',
-	description: 'Plan you next trip ahead',
+	description: 'Never miss a thing in your next trip',
+	authors: [{ name: 'Zayar Lin', url: 'https://www.zayarlyn.com' }],
+	openGraph: { siteName: 'Ikouu', url: 'https://ikouu.zayarlyn.com' },
 }
 
 export default function RootLayout({
